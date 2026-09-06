@@ -193,3 +193,31 @@ img, svg { display: block; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.toast-container {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  gap: 8px;
+  z-index: 20;
+}
+
+.toast {
+  min-width: 240px;
+  max-width: 340px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+  border-radius: var(--radius);
+  font-size: 13px;
+  animation: slide-up 0.2s ease-out;
+}
+
+.toast.is-error { border-left-color: var(--danger); }
+
+@keyframes slide-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
