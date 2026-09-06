@@ -132,14 +132,14 @@ function showOutputError(name, message) {
 }
 
 async function runTool(job, action) {
-  const button = document.getElementById(job.button);
+  const button = document.getElementById(job.button || job.tool + "-button");
   setLoading(button, true);
   setStatus(job.tool, job.status);
   try {
     await action();
   } catch (error) {
     toast(error.message, "error");
-    showOutputError(job.output, error.message);
+    showOutputError(job.output || job.tool, error.message);
   }
   setStatus(job.tool, "");
   setLoading(button, false);
@@ -178,8 +178,7 @@ function showChosenFile(name, file) {
 function runNotes() {
   const file = document.getElementById("notes-file").files[0];
   if (!file) { return toast("Please choose a file first.", "error"); }
-  const job = { button: "notes-button", tool: "notes", output: "notes", status: "Reading your PDF..." };
-  runTool(job, async function () {
+  runTool({ tool: "notes", status: "Reading your PDF..." }, async function () {
     const data = await postFile("/api/notes/upload", file);
     showCard("notes", renderMarkdown(data.summary));
     state.hasDocument = true;
@@ -201,12 +200,8 @@ function askNotes() {
   const input = document.getElementById("notes-question");
   const question = input.value.trim();
   if (!question) { return toast("Please enter something first.", "error"); }
-  const job = {
-    button: "notes-ask-button",
-    tool: "notes",
-    output: "notes-answer",
-    status: "Searching your notes..."
-  };
+  const job = { button: "notes-ask-button", tool: "notes", output: "notes-answer" };
+  job.status = "Searching your notes...";
   runTool(job, async function () {
     const data = await post("/api/notes/ask", { question: question });
     showCard("notes-answer", renderMarkdown(data.answer) + citationHtml(data.pages));
@@ -217,8 +212,7 @@ function askNotes() {
 function runExam() {
   const outline = document.getElementById("exam-input").value.trim();
   if (!outline) { return toast("Please enter something first.", "error"); }
-  const job = { button: "exam-button", tool: "exam", output: "exam", status: "Building your study plan..." };
-  runTool(job, async function () {
+  runTool({ tool: "exam", status: "Building your study plan..." }, async function () {
     const data = await post("/api/exam", { outline: outline });
     showCard("exam", renderMarkdown(data.plan));
   });
@@ -233,8 +227,7 @@ function showImagePreview(file) {
 function runPaper() {
   const file = document.getElementById("paper-file").files[0];
   if (!file) { return toast("Please choose a file first.", "error"); }
-  const job = { button: "paper-button", tool: "paper", output: "paper", status: "Scanning the image..." };
-  runTool(job, async function () {
+  runTool({ tool: "paper", status: "Scanning the image..." }, async function () {
     const data = await postFile("/api/paper/solve", file);
     showCard("paper", renderMarkdown(data.solution));
   });
@@ -243,8 +236,7 @@ function runPaper() {
 function runVideo() {
   const url = document.getElementById("video-input").value.trim();
   if (!url) { return toast("Please enter something first.", "error"); }
-  const job = { button: "video-button", tool: "video", output: "video", status: "Fetching transcript..." };
-  runTool(job, async function () {
+  runTool({ tool: "video", status: "Fetching transcript..." }, async function () {
     const data = await post("/api/video", { url: url });
     showCard("video", renderMarkdown(data.summary));
   });
@@ -253,8 +245,7 @@ function runVideo() {
 function runTopic() {
   const topic = document.getElementById("topic-input").value.trim();
   if (!topic) { return toast("Please enter something first.", "error"); }
-  const job = { button: "topic-button", tool: "topic", output: "topic", status: "Explaining the topic..." };
-  runTool(job, async function () {
+  runTool({ tool: "topic", status: "Explaining the topic..." }, async function () {
     const data = await post("/api/topic", { topic: topic });
     showCard("topic", renderMarkdown(data.explanation));
   });
