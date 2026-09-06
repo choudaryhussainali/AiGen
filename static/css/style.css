@@ -117,6 +117,8 @@ img, svg { display: block; }
   color: var(--danger);
 }
 
+.auth-error.is-success { color: var(--success); }
+
 .auth-switch {
   margin-top: 4px;
   font-size: 13px;

@@ -32,6 +32,7 @@ async function submitAuth(event) {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   errorLine.textContent = "";
+  errorLine.classList.remove("is-success");
   button.disabled = true;
   try {
     if (state.authMode === "login") {
@@ -40,6 +41,7 @@ async function submitAuth(event) {
     } else {
       await post("/api/signup", { email: email, password: password });
       setAuthMode("login");
+      errorLine.classList.add("is-success");
       errorLine.textContent = "Account created. You can log in now.";
     }
   } catch (error) {
