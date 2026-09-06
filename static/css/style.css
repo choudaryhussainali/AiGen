@@ -247,3 +247,28 @@ img, svg { display: block; }
 }
 
 .panel { padding: 32px; }
+
+.nav { display: grid; gap: 2px; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 14px;
+  text-align: left;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.nav-item:hover { background: var(--bg); color: var(--text); }
+
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 500;
+}
