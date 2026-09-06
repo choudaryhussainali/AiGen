@@ -134,6 +134,10 @@ function showOutput(name, html) {
   document.getElementById(name + "-output").innerHTML = html;
 }
 
+function showCard(name, html) {
+  showOutput(name, '<div class="output-card">' + html + "</div>");
+}
+
 function showOutputError(name, message) {
   showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>");
 }
@@ -193,6 +197,7 @@ async function runNotes() {
   setStatus("notes", "Reading your PDF...");
   try {
     const data = await postFile("/api/notes/upload", file);
+    setStatus("notes", "Indexing " + data.pages + " pages...");
     showOutput("notes", '<div class="output-card">' + renderMarkdown(data.summary) + "</div>");
     state.hasDocument = true;
     document.getElementById("notes-followup").hidden = false;
