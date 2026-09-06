@@ -259,6 +259,26 @@ async function runExam() {
   setLoading(button, false);
 }
 
+async function runVideo() {
+  const button = document.getElementById("video-button");
+  const url = document.getElementById("video-input").value.trim();
+  if (!url) {
+    toast("Please enter something first.", "error");
+    return;
+  }
+  setLoading(button, true);
+  setStatus("video", "Fetching transcript...");
+  try {
+    const data = await post("/api/video", { url: url });
+    showOutput("video", '<div class="output-card">' + renderMarkdown(data.summary) + "</div>");
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError("video", error.message);
+  }
+  setStatus("video", "");
+  setLoading(button, false);
+}
+
 async function runTopic() {
   const button = document.getElementById("topic-button");
   const topic = document.getElementById("topic-input").value.trim();
