@@ -6,6 +6,7 @@
   --text-muted: #78716C;
   --accent: #2563EB;
   --accent-soft: #EFF6FF;
+  --accent-hover: #1D4ED8;
   --danger: #DC2626;
   --success: #16A34A;
 
@@ -63,3 +64,29 @@ img, svg { display: block; }
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
+
+.btn {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn:hover { border-color: var(--text-muted); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
