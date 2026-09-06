@@ -35,3 +35,15 @@ img, svg { display: block; }
   border-radius: var(--radius);
   padding: 32px;
 }
+
+.wordmark {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
