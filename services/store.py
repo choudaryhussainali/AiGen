@@ -1,7 +1,9 @@
 """In RAM session store. Nothing here is ever written to disk."""
 
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+from config import SESSION_TIMEOUT_MINUTES
 
 _sessions = {}
 
@@ -31,3 +33,10 @@ def wipe_session(session_id):
     # written to persistent storage and that every reference to it is dropped
     # here, making it eligible for garbage collection.
     _sessions.pop(session_id, None)
+
+
+def purge_expired():
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=SESSION_TIMEOUT_MINUTES)
+    stale = [key for key, value in _sessions.items() if value["last_seen"] < cutoff]
+    for key in stale:
+        wipe_session(key)
