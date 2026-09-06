@@ -216,6 +216,29 @@ function citationHtml(pages) {
     + badges.join("") + "</div>";
 }
 
+async function askNotes() {
+  const button = document.getElementById("notes-ask-button");
+  const input = document.getElementById("notes-question");
+  const question = input.value.trim();
+  if (!question) {
+    toast("Please enter something first.", "error");
+    return;
+  }
+  setLoading(button, true);
+  setStatus("notes", "Searching your notes...");
+  try {
+    const data = await post("/api/notes/ask", { question: question });
+    showOutput("notes-answer", '<div class="output-card">'
+      + renderMarkdown(data.answer) + citationHtml(data.pages) + "</div>");
+    input.value = "";
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError("notes-answer", error.message);
+  }
+  setStatus("notes", "");
+  setLoading(button, false);
+}
+
 async function runExam() {
   const button = document.getElementById("exam-button");
   const outline = document.getElementById("exam-input").value.trim();
