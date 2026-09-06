@@ -179,6 +179,11 @@ function initDashboard() {
   });
   document.getElementById("logout-button").addEventListener("click", logout);
   document.getElementById("topic-button").addEventListener("click", runTopic);
+  document.getElementById("topic-input").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      runTopic();
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
