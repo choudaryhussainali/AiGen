@@ -34,7 +34,10 @@ def embed(texts):
 
 
 def generate(prompt):
-    response = _client.models.generate_content(model=TEXT_MODEL, contents=prompt)
+    try:
+        response = _client.models.generate_content(model=TEXT_MODEL, contents=prompt)
+    except Exception as error:
+        _raise_friendly(error)
     text = (response.text or "").strip()
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
