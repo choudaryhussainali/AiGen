@@ -245,3 +245,13 @@ img, svg { display: block; }
 .tool.active { display: block; }
 .tool-input { display: grid; gap: 12px; margin-bottom: 24px; }
 .tool-input .btn-primary { justify-self: start; }
+
+.followup {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: var(--gap);
+}
+
+#notes-answer-output:empty { display: none; }
+#notes-answer-output { margin-top: var(--gap); }
