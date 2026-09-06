@@ -20,6 +20,30 @@ function escapeHtml(text) {
     .replace(/>/g, "&gt;");
 }
 
+function renderMarkdown(text) {
+  const lines = escapeHtml(text).split("\n");
+  let html = "";
+  let inList = false;
+  lines.forEach(function (line) {
+    const trimmed = line.trim().replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    if (trimmed.startsWith("- ")) {
+      html += (inList ? "" : "<ul>") + "<li>" + trimmed.slice(2) + "</li>";
+      inList = true;
+      return;
+    }
+    if (inList) {
+      html += "</ul>";
+      inList = false;
+    }
+    if (trimmed.startsWith("## ")) {
+      html += "<h3>" + trimmed.slice(3) + "</h3>";
+    } else if (trimmed) {
+      html += "<p>" + trimmed + "</p>";
+    }
+  });
+  return inList ? html + "</ul>" : html;
+}
+
 function setLoading(button, isLoading) {
   if (isLoading) {
     button.dataset.label = button.textContent;
