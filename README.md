@@ -91,3 +91,17 @@ model downloads, is slow on CPU, and still cannot read mathematical notation.
 Gemini vision reads the image directly, handles handwriting and formulas, and
 lets a single API call both read the question and solve it, which removes an
 entire dependency and an entire processing stage.
+
+## Known limitations
+
+- English only. The prompts and the transcript lookup both assume English.
+- No chat history. Follow up answers are not remembered between questions.
+- One worker only. Sessions live in the memory of a single process, so in
+  production this must run under a single Gunicorn worker
+  (`gunicorn -w 1 app:app`). A second worker would not see the first one's
+  sessions.
+- Uploads are capped at 10 MB, for both PDFs and images.
+- Videos without subtitles cannot be summarised, because there is no transcript
+  to read.
+- On the Gemini free tier the embedding endpoint allows 100 requests a minute,
+  so a very large PDF can hit that limit and ask you to retry.
