@@ -30,3 +30,18 @@ moment they log out.
 | PDF text | pypdf |
 | Transcripts | youtube-transcript-api |
 | Sessions | Python dictionary in RAM |
+
+## Setup
+
+```bash
+git clone https://github.com/choudaryhussainali/AiGen.git
+cd AiGen
+python -m venv venv
+venv\Scripts\activate        # on macOS or Linux: source venv/bin/activate
+pip install -r requirements.txt
+copy .env.example .env       # on macOS or Linux: cp .env.example .env
+python app.py
+```
+
+Fill the four values in `.env` before starting the server, then open
+http://127.0.0.1:5000 in a browser.
