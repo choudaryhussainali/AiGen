@@ -205,6 +205,17 @@ async function runNotes() {
   setLoading(button, false);
 }
 
+function citationHtml(pages) {
+  if (!pages.length) {
+    return "";
+  }
+  const badges = pages.map(function (page) {
+    return '<span class="citation">page ' + page + "</span>";
+  });
+  return '<div class="citations"><span class="citation-label">Source:</span>'
+    + badges.join("") + "</div>";
+}
+
 async function runExam() {
   const button = document.getElementById("exam-button");
   const outline = document.getElementById("exam-input").value.trim();
