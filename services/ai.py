@@ -32,3 +32,21 @@ def generate_from_image(image_bytes, mime_type, prompt):
     if not text:
         raise ValueError("The model could not read that image. Please try another.")
     return text
+
+
+def explain_topic(topic):
+    prompt = f"""Explain the topic below to a university student in simple English.
+
+Topic: {topic}
+
+Use this exact structure and nothing else:
+## Definition
+One short paragraph in plain language.
+## Real World Analogy
+One short paragraph comparing it to something familiar.
+## Key Points
+Exactly three bullets, each starting with "- " and using **bold** for the
+important term.
+
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+    return generate(prompt)
