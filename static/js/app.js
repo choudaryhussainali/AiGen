@@ -83,9 +83,7 @@ function setAuthMode(mode) {
   const isLogin = mode === "login";
   document.getElementById("auth-heading").textContent = isLogin ? "Log in" : "Create account";
   document.getElementById("auth-submit").textContent = isLogin ? "Log in" : "Create account";
-  document.getElementById("auth-switch-text").textContent = isLogin
-    ? "New to AiGen?"
-    : "Already have an account?";
+  document.getElementById("auth-switch-text").textContent = isLogin ? "New to AiGen?" : "Already have an account?";
   document.getElementById("auth-switch-link").textContent = isLogin ? "Create account" : "Log in";
   document.getElementById("auth-error").textContent = "";
 }
@@ -154,9 +152,7 @@ async function postFile(url, file) {
 function bindDropzone(name, onFile) {
   const zone = document.getElementById(name + "-dropzone");
   const input = document.getElementById(name + "-file");
-  const choose = function () {
-    if (input.files[0]) { onFile(input.files[0]); }
-  };
+  const choose = function () { if (input.files[0]) { onFile(input.files[0]); } };
   input.addEventListener("change", choose);
   zone.addEventListener("dragleave", function () { zone.classList.remove("is-active"); });
   zone.addEventListener("dragover", function (event) {
@@ -190,9 +186,7 @@ function runNotes() {
 
 function citationHtml(pages) {
   if (!pages.length) { return ""; }
-  const badges = pages.map(function (page) {
-    return '<span class="citation">page ' + page + "</span>";
-  });
+  const badges = pages.map(function (page) { return '<span class="citation">page ' + page + "</span>"; });
   return '<div class="citations"><span class="citation-label">Source:</span>' + badges.join("") + "</div>";
 }
 
@@ -272,9 +266,7 @@ function onEnter(id, handler) {
 
 function initDashboard() {
   document.querySelectorAll(".nav-item").forEach(function (button) {
-    button.addEventListener("click", function () {
-      switchTool(button.dataset.tool);
-    });
+    button.addEventListener("click", function () { switchTool(button.dataset.tool); });
   });
   bindDropzone("notes", function (file) {
     showChosenFile("notes", file);
