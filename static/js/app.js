@@ -193,6 +193,7 @@ function citationHtml(pages) {
 function askNotes() {
   const input = document.getElementById("notes-question");
   const question = input.value.trim();
+  if (!state.hasDocument) { return toast("Upload a PDF before asking questions.", "error"); }
   if (!question) { return toast("Please enter something first.", "error"); }
   const job = { button: "notes-ask-button", tool: "notes", output: "notes-answer" };
   job.status = "Searching your notes...";
