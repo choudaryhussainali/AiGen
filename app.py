@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, redirect, render_template, request, session
 
 import config
 from services import auth, store
@@ -23,6 +23,14 @@ def current_session():
     if not session_id:
         return None, None
     return session_id, store.get_session(session_id)
+
+
+@app.get("/")
+def index():
+    _, active = current_session()
+    if active:
+        return redirect("/dashboard")
+    return render_template("auth.html")
 
 
 @app.post("/api/signup")
