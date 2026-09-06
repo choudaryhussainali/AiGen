@@ -78,6 +78,22 @@ def api_login():
         return json_error(str(error), 500)
 
 
+@app.post("/api/exam")
+def api_exam():
+    try:
+        _, active = current_session()
+        if active is None:
+            return json_error("Not authenticated", 401)
+        outline = (request.get_json(silent=True) or {}).get("outline", "").strip()
+        if not outline:
+            return json_error("Please enter something first.")
+        return json_ok({"plan": ai.build_exam_plan(outline)})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
 @app.post("/api/topic")
 def api_topic():
     try:
