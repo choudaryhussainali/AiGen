@@ -61,6 +61,26 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate(prompt)
 
 
+def answer_from_notes(question, chunks, embeddings):
+    top = _top_chunks(question, chunks, embeddings)
+    context = "\n\n".join(
+        f"[page {chunk['page']}]\n{chunk['text']}" for chunk in top
+    )
+    prompt = f"""Answer the student question using only the notes below.
+
+Notes:
+{context}
+
+Question: {question}
+
+Answer in two or three sentences of plain English. If the notes do not contain
+the answer, reply with exactly: I could not find this in your notes
+
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+    answer = generate(prompt)
+    return answer, sorted({chunk["page"] for chunk in top})
+
+
 def build_exam_plan(outline):
     prompt = f"""You are helping a university student prepare for an exam.
 
