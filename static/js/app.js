@@ -248,24 +248,17 @@ function askNotes() {
   });
 }
 
-async function runExam() {
-  const button = document.getElementById("exam-button");
+function runExam() {
   const outline = document.getElementById("exam-input").value.trim();
   if (!outline) {
     toast("Please enter something first.", "error");
     return;
   }
-  setLoading(button, true);
-  setStatus("exam", "Building your study plan...");
-  try {
+  const job = { button: "exam-button", tool: "exam", output: "exam", status: "Building your study plan..." };
+  runTool(job, async function () {
     const data = await post("/api/exam", { outline: outline });
-    showOutput("exam", '<div class="output-card">' + renderMarkdown(data.plan) + "</div>");
-  } catch (error) {
-    toast(error.message, "error");
-    showOutputError("exam", error.message);
-  }
-  setStatus("exam", "");
-  setLoading(button, false);
+    showCard("exam", renderMarkdown(data.plan));
+  });
 }
 
 function showImagePreview(file) {
