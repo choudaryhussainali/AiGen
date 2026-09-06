@@ -35,9 +35,9 @@ they log out.
 git clone https://github.com/choudaryhussainali/AiGen.git
 cd AiGen
 python -m venv venv
-venv\Scripts\activate        # on macOS or Linux: source venv/bin/activate
+source venv/bin/activate     # on Windows: venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env       # on macOS or Linux: cp .env.example .env
+cp .env.example .env         # on Windows: copy .env.example .env
 python app.py
 ```
 
