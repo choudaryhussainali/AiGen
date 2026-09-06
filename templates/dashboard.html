@@ -43,7 +43,17 @@
     <section class="tool" id="tool-exam"></section>
     <section class="tool" id="tool-paper"></section>
     <section class="tool" id="tool-video"></section>
-    <section class="tool" id="tool-topic"></section>
+    <section class="tool" id="tool-topic">
+      <div class="tool-input">
+        <input class="input" id="topic-input" type="text"
+               placeholder="For example: recursion, normalisation, TCP handshake">
+        <button class="btn btn-primary" id="topic-button" type="button">Explain topic</button>
+      </div>
+      <p class="status-line" id="topic-status"></p>
+      <div class="tool-output" id="topic-output">
+        <p class="empty-state">Your explanation will appear here.</p>
+      </div>
+    </section>
   </main>
 </div>
 {% endblock %}
