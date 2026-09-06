@@ -1,3 +1,5 @@
+import io
+
 from flask import Flask, jsonify, redirect, render_template, request, session
 
 import config
@@ -15,6 +17,16 @@ def json_ok(data):
 
 def json_error(message, status=400):
     return jsonify({"ok": False, "error": message}), status
+
+
+def read_upload(upload, extensions, format_message):
+    """Reads an upload into memory, nothing is ever written to disk."""
+    if not upload.filename.lower().endswith(extensions):
+        raise ValueError(format_message)
+    data = upload.read()
+    if len(data) > config.MAX_FILE_MB * 1024 * 1024:
+        raise ValueError("File is too large. Maximum size is 10 MB.")
+    return data
 
 
 def current_session():
@@ -87,7 +99,8 @@ def api_notes_upload():
         upload = request.files.get("file")
         if upload is None:
             return json_error("Please choose a file first.")
-        pages = documents.extract_pdf_pages(upload.stream)
+        data = read_upload(upload, (".pdf",), "Please upload a PDF file.")
+        pages = documents.extract_pdf_pages(io.BytesIO(data))
         chunks = documents.chunk_pages(pages)
         store.set_document(session_id, chunks, None, upload.filename)
         summary = ai.summarize_notes("\n".join(page["text"] for page in pages))
