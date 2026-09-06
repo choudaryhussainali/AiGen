@@ -1,6 +1,7 @@
 import io
 
 from flask import Flask, jsonify, redirect, render_template, request, session
+from werkzeug.exceptions import RequestEntityTooLarge
 
 import config
 from services import ai, auth, documents, store, youtube
@@ -25,6 +26,14 @@ def json_error(message, status=400):
 @app.errorhandler(413)
 def too_large(error):
     return json_error("File is too large. Maximum size is 10 MB.", 413)
+
+
+def get_upload():
+    """Touching request.files raises 413 once the body passes the size cap."""
+    try:
+        return request.files.get("file")
+    except RequestEntityTooLarge:
+        raise ValueError("File is too large. Maximum size is 10 MB.")
 
 
 def read_upload(upload, extensions, format_message):
@@ -104,7 +113,7 @@ def api_notes_upload():
         session_id, active = current_session()
         if active is None:
             return json_error("Not authenticated", 401)
-        upload = request.files.get("file")
+        upload = get_upload()
         if upload is None:
             return json_error("Please choose a file first.")
         data = read_upload(upload, (".pdf",), "Please upload a PDF file.")
