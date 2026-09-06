@@ -21,12 +21,10 @@ they log out.
 |---|---|
 | Language | Python 3.11 or newer |
 | Web framework | Flask 3, synchronous |
-| Templating | Jinja2 |
-| Frontend | HTML5, CSS3, vanilla JavaScript, no build step |
+| Frontend | Jinja2, HTML5, CSS3, vanilla JavaScript, no build step |
 | Auth | Supabase Python client, email and password |
 | LLM | Google Gemini via google-genai, text and vision |
-| Embeddings | Gemini embedding model |
-| Vector search | numpy cosine similarity over a list in RAM |
+| Vector search | Gemini embeddings, numpy cosine similarity over a RAM list |
 | PDF text | pypdf |
 | Transcripts | youtube-transcript-api 1.2.4 or newer |
 | Sessions | Python dictionary in RAM |
