@@ -50,6 +50,9 @@ def api_login():
         if not email or not password:
             return json_error("Please enter something first.")
         account = auth.sign_in(email, password)
+        session["session_id"] = store.create_session(
+            account["email"], account["access_token"]
+        )
         return json_ok({"email": account["email"]})
     except ValueError as error:
         return json_error(str(error))
