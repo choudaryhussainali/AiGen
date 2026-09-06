@@ -49,3 +49,17 @@ async function submitAuth(event) {
   }
   button.disabled = false;
 }
+
+function initAuthPage() {
+  document.getElementById("auth-form").addEventListener("submit", submitAuth);
+  document.getElementById("auth-switch-link").addEventListener("click", function (event) {
+    event.preventDefault();
+    setAuthMode(state.authMode === "login" ? "signup" : "login");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  if (document.getElementById("auth-form")) {
+    initAuthPage();
+  }
+});
