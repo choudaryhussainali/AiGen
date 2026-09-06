@@ -177,6 +177,11 @@ function bindDropzone(name, onFile) {
   });
 }
 
+function showChosenFile(name, file) {
+  document.getElementById(name + "-dropzone").classList.add("is-active");
+  document.getElementById(name + "-dropzone-label").textContent = file.name;
+}
+
 async function runExam() {
   const button = document.getElementById("exam-button");
   const outline = document.getElementById("exam-input").value.trim();
