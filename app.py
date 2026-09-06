@@ -174,7 +174,7 @@ def api_paper_solve():
         _, active = current_session()
         if active is None:
             return json_error("Not authenticated", 401)
-        upload = request.files.get("file")
+        upload = get_upload()
         if upload is None:
             return json_error("Please choose a file first.")
         message = "Please upload a JPG or PNG image."
