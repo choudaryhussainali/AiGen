@@ -40,3 +40,12 @@ def purge_expired():
     stale = [key for key, value in _sessions.items() if value["last_seen"] < cutoff]
     for key in stale:
         wipe_session(key)
+
+
+def get_session(session_id):
+    purge_expired()
+    session = _sessions.get(session_id)
+    if session is None:
+        return None
+    session["last_seen"] = datetime.now(timezone.utc)
+    return session
