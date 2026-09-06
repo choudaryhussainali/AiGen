@@ -61,3 +61,17 @@ from application code because row level security governs what it can reach.
 In the Supabase dashboard under Authentication, Providers, Email, turn
 "Confirm email" off if you want new accounts to be able to log in straight away.
 Leaving it on means a new user has to click the link in their inbox first.
+
+## How Zero Persistence works
+
+Logging in creates an entry in a plain Python dictionary in `services/store.py`.
+That entry holds the user's email, their Supabase access token, and, once they
+upload a PDF, its text chunks and embeddings. Nothing study related is ever
+written to disk or to the database. Uploads are read from the request stream
+straight into memory. The browser cookie carries only the session id. Logging
+out deletes the whole dictionary entry, and any session untouched for 60 minutes
+is deleted on the next request that arrives.
+
+Python cannot guarantee that freed memory is overwritten, so this is not a
+secure erase. What it does guarantee is that the content never reaches
+persistent storage and that every reference to it is dropped.
