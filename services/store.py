@@ -49,3 +49,12 @@ def get_session(session_id):
         return None
     session["last_seen"] = datetime.now(timezone.utc)
     return session
+
+
+def set_document(session_id, chunks, embeddings, filename):
+    session = _sessions.get(session_id)
+    if session is None:
+        return
+    session["chunks"] = chunks
+    session["embeddings"] = embeddings
+    session["filename"] = filename
