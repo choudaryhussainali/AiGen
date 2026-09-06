@@ -75,3 +75,10 @@ is deleted on the next request that arrives.
 Python cannot guarantee that freed memory is overwritten, so this is not a
 secure erase. What it does guarantee is that the content never reaches
 persistent storage and that every reference to it is dropped.
+
+## Privacy scope
+
+> Zero-Persistence applies to AiGen's own infrastructure: uploaded content lives
+> in server RAM only, is never written to disk or to the database, and is
+> destroyed on logout. Content sent to the Google Gemini API for inference is
+> governed by Google's API terms, which are outside AiGen's control.
