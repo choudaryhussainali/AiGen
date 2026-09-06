@@ -9,6 +9,9 @@ app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET_KEY
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+# Two megabytes of headroom over the file cap, so the friendly size message in
+# read_upload fires first and only far larger bodies are refused outright.
+app.config["MAX_CONTENT_LENGTH"] = (config.MAX_FILE_MB + 2) * 1024 * 1024
 
 
 def json_ok(data):
