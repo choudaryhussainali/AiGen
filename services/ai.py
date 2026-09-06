@@ -46,9 +46,12 @@ def generate(prompt):
 
 def generate_from_image(image_bytes, mime_type, prompt):
     part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-    response = _client.models.generate_content(
-        model=TEXT_MODEL, contents=[part, prompt]
-    )
+    try:
+        response = _client.models.generate_content(
+            model=TEXT_MODEL, contents=[part, prompt]
+        )
+    except Exception as error:
+        _raise_friendly(error)
     text = (response.text or "").strip()
     if not text:
         raise ValueError("The model could not read that image. Please try another.")
