@@ -130,12 +130,22 @@ function initAuthPage() {
   });
 }
 
+async function logout() {
+  try {
+    await post("/api/logout");
+  } catch (error) {
+    toast(error.message, "error");
+  }
+  window.location = "/";
+}
+
 function initDashboard() {
   document.querySelectorAll(".nav-item").forEach(function (button) {
     button.addEventListener("click", function () {
       switchTool(button.dataset.tool);
     });
   });
+  document.getElementById("logout-button").addEventListener("click", logout);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
