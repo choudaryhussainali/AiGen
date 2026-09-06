@@ -60,5 +60,17 @@ def api_login():
         return json_error(str(error), 500)
 
 
+@app.post("/api/logout")
+def api_logout():
+    try:
+        session_id, active = current_session()
+        if active:
+            auth.sign_out(active["access_token"])
+            store.wipe_session(session_id)
+        return json_ok({"message": "Session wiped"})
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
