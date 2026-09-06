@@ -122,6 +122,20 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate(prompt)
 
 
+def summarize_video(transcript):
+    prompt = f"""Summarise this lecture video for a student who has not watched it.
+
+Transcript:
+{transcript}
+
+Write a topic wise summary. Use a "## " heading for each topic the video
+covers, then two or three bullets under it starting with "- ". Use **bold**
+for the key terms. Keep the order the video uses.
+
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+    return generate(prompt)
+
+
 def explain_topic(topic):
     prompt = f"""Explain the topic below to a university student in simple English.
 
