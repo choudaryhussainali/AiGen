@@ -175,7 +175,7 @@ function showChosenFile(name, file) {
 function runNotes() {
   const file = document.getElementById("notes-file").files[0];
   if (!file) { return toast("Please choose a file first.", "error"); }
-  runTool({ tool: "notes", status: "Reading your PDF..." }, async function () {
+  runTool({ tool: "notes", status: "Reading and indexing your PDF..." }, async function () {
     const data = await postFile("/api/notes/upload", file);
     showCard("notes", renderMarkdown(data.summary));
     state.hasDocument = true;
