@@ -230,3 +230,20 @@ img, svg { display: block; }
 }
 
 .output-error { color: var(--danger); font-size: 14px; }
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 24px 16px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+
+.panel { padding: 32px; }
