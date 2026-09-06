@@ -44,3 +44,11 @@ def sign_in(email, password):
         "email": result.user.email,
         "access_token": result.session.access_token,
     }
+
+
+def sign_out(access_token):
+    # A failed revoke must never block logout, the RAM session is wiped anyway.
+    try:
+        _client.auth.admin.sign_out(access_token)
+    except Exception:
+        pass
