@@ -187,10 +187,7 @@ function showChosenFile(name, file) {
 
 function runNotes() {
   const file = document.getElementById("notes-file").files[0];
-  if (!file) {
-    toast("Please choose a file first.", "error");
-    return;
-  }
+  if (!file) { return toast("Please choose a file first.", "error"); }
   const job = { button: "notes-button", tool: "notes", output: "notes", status: "Reading your PDF..." };
   runTool(job, async function () {
     const data = await postFile("/api/notes/upload", file);
@@ -216,10 +213,7 @@ function citationHtml(pages) {
 function askNotes() {
   const input = document.getElementById("notes-question");
   const question = input.value.trim();
-  if (!question) {
-    toast("Please enter something first.", "error");
-    return;
-  }
+  if (!question) { return toast("Please enter something first.", "error"); }
   const job = {
     button: "notes-ask-button",
     tool: "notes",
@@ -235,10 +229,7 @@ function askNotes() {
 
 function runExam() {
   const outline = document.getElementById("exam-input").value.trim();
-  if (!outline) {
-    toast("Please enter something first.", "error");
-    return;
-  }
+  if (!outline) { return toast("Please enter something first.", "error"); }
   const job = { button: "exam-button", tool: "exam", output: "exam", status: "Building your study plan..." };
   runTool(job, async function () {
     const data = await post("/api/exam", { outline: outline });
@@ -254,10 +245,7 @@ function showImagePreview(file) {
 
 function runPaper() {
   const file = document.getElementById("paper-file").files[0];
-  if (!file) {
-    toast("Please choose a file first.", "error");
-    return;
-  }
+  if (!file) { return toast("Please choose a file first.", "error"); }
   const job = { button: "paper-button", tool: "paper", output: "paper", status: "Scanning the image..." };
   runTool(job, async function () {
     const data = await postFile("/api/paper/solve", file);
@@ -267,10 +255,7 @@ function runPaper() {
 
 function runVideo() {
   const url = document.getElementById("video-input").value.trim();
-  if (!url) {
-    toast("Please enter something first.", "error");
-    return;
-  }
+  if (!url) { return toast("Please enter something first.", "error"); }
   const job = { button: "video-button", tool: "video", output: "video", status: "Fetching transcript..." };
   runTool(job, async function () {
     const data = await post("/api/video", { url: url });
@@ -280,10 +265,7 @@ function runVideo() {
 
 function runTopic() {
   const topic = document.getElementById("topic-input").value.trim();
-  if (!topic) {
-    toast("Please enter something first.", "error");
-    return;
-  }
+  if (!topic) { return toast("Please enter something first.", "error"); }
   const job = { button: "topic-button", tool: "topic", output: "topic", status: "Explaining the topic..." };
   runTool(job, async function () {
     const data = await post("/api/topic", { topic: topic });
