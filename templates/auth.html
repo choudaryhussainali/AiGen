@@ -5,6 +5,17 @@
   <div class="auth-card">
     <h1 class="wordmark">AiGen</h1>
     <p class="tagline">Five AI study tools in one calm workspace.</p>
+
+    <h2 class="auth-heading" id="auth-heading">Log in</h2>
+    <form class="auth-form" id="auth-form">
+      <label class="field-label" for="email">Email</label>
+      <input class="input" type="email" id="email" autocomplete="email" required>
+
+      <label class="field-label" for="password">Password</label>
+      <input class="input" type="password" id="password" autocomplete="current-password" required>
+
+      <button class="btn btn-primary" type="submit" id="auth-submit">Log in</button>
+    </form>
   </div>
 </main>
 {% endblock %}
