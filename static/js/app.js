@@ -182,6 +182,29 @@ function showChosenFile(name, file) {
   document.getElementById(name + "-dropzone-label").textContent = file.name;
 }
 
+async function runNotes() {
+  const button = document.getElementById("notes-button");
+  const file = document.getElementById("notes-file").files[0];
+  if (!file) {
+    toast("Please choose a file first.", "error");
+    return;
+  }
+  setLoading(button, true);
+  setStatus("notes", "Reading your PDF...");
+  try {
+    const data = await postFile("/api/notes/upload", file);
+    showOutput("notes", '<div class="output-card">' + renderMarkdown(data.summary) + "</div>");
+    state.hasDocument = true;
+    document.getElementById("notes-followup").hidden = false;
+    toast(data.filename + " summarised from " + data.pages + " pages");
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError("notes", error.message);
+  }
+  setStatus("notes", "");
+  setLoading(button, false);
+}
+
 async function runExam() {
   const button = document.getElementById("exam-button");
   const outline = document.getElementById("exam-input").value.trim();
