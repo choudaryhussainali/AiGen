@@ -12,6 +12,9 @@ _client = genai.Client(api_key=GEMINI_API_KEY)
 def _raise_friendly(error):
     """Gemini quota and safety errors reach the user as readable sentences."""
     text = str(error)
+    # A daily quota block lasts until midnight Pacific, a per minute one does not.
+    if "PerDay" in text:
+        raise ValueError("The daily Gemini free quota is used up. It resets at midnight Pacific Time.")
     if "RESOURCE_EXHAUSTED" in text or "429" in text:
         raise ValueError("The AI service is busy right now. Please wait a minute.")
     if "UNAVAILABLE" in text or "503" in text:
