@@ -168,8 +168,9 @@ function bindDropzone(name, onFile) {
 }
 
 function showChosenFile(name, file) {
+  const size = (file.size / (1024 * 1024)).toFixed(1);
   document.getElementById(name + "-dropzone").classList.add("is-active");
-  document.getElementById(name + "-dropzone-label").textContent = file.name;
+  document.getElementById(name + "-dropzone-label").textContent = file.name + " (" + size + " MB)";
 }
 
 function runNotes() {
