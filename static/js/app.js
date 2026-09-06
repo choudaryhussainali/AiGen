@@ -78,9 +78,10 @@ function toast(message, type) {
 function setAuthMode(mode) {
   state.authMode = mode;
   const isLogin = mode === "login";
-  document.getElementById("auth-heading").textContent = isLogin ? "Log in" : "Create account";
-  document.getElementById("auth-submit").textContent = isLogin ? "Log in" : "Create account";
-  document.getElementById("auth-switch-text").textContent = isLogin ? "New to AiGen?" : "Already have an account?";
+  const action = isLogin ? "Log in" : "Create account";
+  document.getElementById("auth-heading").textContent = action;
+  document.getElementById("auth-submit").textContent = action;
+  document.getElementById("auth-switch-text").textContent = isLogin ? "New to AiGen?" : "Have an account?";
   document.getElementById("auth-switch-link").textContent = isLogin ? "Create account" : "Log in";
   document.getElementById("auth-error").textContent = "";
   document.getElementById("password").autocomplete = isLogin ? "current-password" : "new-password";
