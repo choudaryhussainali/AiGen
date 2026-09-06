@@ -102,7 +102,8 @@ def api_notes_upload():
         data = read_upload(upload, (".pdf",), "Please upload a PDF file.")
         pages = documents.extract_pdf_pages(io.BytesIO(data))
         chunks = documents.chunk_pages(pages)
-        store.set_document(session_id, chunks, None, upload.filename)
+        embeddings = ai.embed([chunk["text"] for chunk in chunks])
+        store.set_document(session_id, chunks, embeddings, upload.filename)
         summary = ai.summarize_notes("\n".join(page["text"] for page in pages))
         return json_ok(
             {"summary": summary, "filename": upload.filename, "pages": len(pages)}
