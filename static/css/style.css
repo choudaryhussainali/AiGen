@@ -283,3 +283,17 @@ img, svg { display: block; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.sidebar-footer {
+  margin-top: auto;
+  display: grid;
+  gap: 8px;
+  padding-top: var(--gap);
+  border-top: 1px solid var(--border);
+}
+
+.user-email {
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
