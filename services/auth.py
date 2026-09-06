@@ -29,3 +29,18 @@ def sign_up(email, password):
     if result.user is None:
         raise ValueError("Could not create that account.")
     return {"email": result.user.email}
+
+
+def sign_in(email, password):
+    try:
+        result = _client.auth.sign_in_with_password(
+            {"email": email, "password": password}
+        )
+    except Exception as error:
+        raise ValueError(_friendly_error(error))
+    if result.session is None:
+        raise ValueError("Invalid email or password.")
+    return {
+        "email": result.user.email,
+        "access_token": result.session.access_token,
+    }
