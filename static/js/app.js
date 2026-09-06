@@ -142,6 +142,26 @@ function setStatus(name, message) {
   document.getElementById(name + "-status").textContent = message;
 }
 
+async function runExam() {
+  const button = document.getElementById("exam-button");
+  const outline = document.getElementById("exam-input").value.trim();
+  if (!outline) {
+    toast("Please enter something first.", "error");
+    return;
+  }
+  setLoading(button, true);
+  setStatus("exam", "Building your study plan...");
+  try {
+    const data = await post("/api/exam", { outline: outline });
+    showOutput("exam", '<div class="output-card">' + renderMarkdown(data.plan) + "</div>");
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError("exam", error.message);
+  }
+  setStatus("exam", "");
+  setLoading(button, false);
+}
+
 async function runTopic() {
   const button = document.getElementById("topic-button");
   const topic = document.getElementById("topic-input").value.trim();
