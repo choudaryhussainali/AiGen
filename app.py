@@ -33,6 +33,14 @@ def index():
     return render_template("auth.html")
 
 
+@app.get("/dashboard")
+def dashboard():
+    _, active = current_session()
+    if active is None:
+        return redirect("/")
+    return render_template("dashboard.html", email=active["email"])
+
+
 @app.post("/api/signup")
 def api_signup():
     try:
