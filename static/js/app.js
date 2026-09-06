@@ -293,24 +293,17 @@ function runVideo() {
   });
 }
 
-async function runTopic() {
-  const button = document.getElementById("topic-button");
+function runTopic() {
   const topic = document.getElementById("topic-input").value.trim();
   if (!topic) {
     toast("Please enter something first.", "error");
     return;
   }
-  setLoading(button, true);
-  setStatus("topic", "Explaining the topic...");
-  try {
+  const job = { button: "topic-button", tool: "topic", output: "topic", status: "Explaining the topic..." };
+  runTool(job, async function () {
     const data = await post("/api/topic", { topic: topic });
-    showOutput("topic", '<div class="output-card">' + renderMarkdown(data.explanation) + "</div>");
-  } catch (error) {
-    toast(error.message, "error");
-    showOutputError("topic", error.message);
-  }
-  setStatus("topic", "");
-  setLoading(button, false);
+    showCard("topic", renderMarkdown(data.explanation));
+  });
 }
 
 async function logout() {
