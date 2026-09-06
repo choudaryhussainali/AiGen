@@ -280,24 +280,17 @@ function runPaper() {
   });
 }
 
-async function runVideo() {
-  const button = document.getElementById("video-button");
+function runVideo() {
   const url = document.getElementById("video-input").value.trim();
   if (!url) {
     toast("Please enter something first.", "error");
     return;
   }
-  setLoading(button, true);
-  setStatus("video", "Fetching transcript...");
-  try {
+  const job = { button: "video-button", tool: "video", output: "video", status: "Fetching transcript..." };
+  runTool(job, async function () {
     const data = await post("/api/video", { url: url });
-    showOutput("video", '<div class="output-card">' + renderMarkdown(data.summary) + "</div>");
-  } catch (error) {
-    toast(error.message, "error");
-    showOutputError("video", error.message);
-  }
-  setStatus("video", "");
-  setLoading(button, false);
+    showCard("video", renderMarkdown(data.summary));
+  });
 }
 
 async function runTopic() {
