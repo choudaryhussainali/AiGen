@@ -41,5 +41,21 @@ def api_signup():
         return json_error(str(error), 500)
 
 
+@app.post("/api/login")
+def api_login():
+    try:
+        payload = request.get_json(silent=True) or {}
+        email = (payload.get("email") or "").strip()
+        password = payload.get("password") or ""
+        if not email or not password:
+            return json_error("Please enter something first.")
+        account = auth.sign_in(email, password)
+        return json_ok({"email": account["email"]})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
