@@ -124,6 +124,23 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate(prompt)
 
 
+def solve_paper(image_bytes, mime_type):
+    prompt = """This image is from a past exam paper. Read every question in it,
+then solve each one.
+
+For each question use this exact structure:
+## Question
+The question exactly as written in the image.
+## Solution
+The full working, one step per line.
+## Explanation
+Two or three sentences on why the method works.
+
+If part of the image is unreadable, say so instead of guessing.
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+    return generate_from_image(image_bytes, mime_type, prompt)
+
+
 def summarize_video(transcript):
     prompt = f"""Summarise this lecture video for a student who has not watched it.
 
