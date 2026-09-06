@@ -1,11 +1,18 @@
 """All Gemini calls plus the retrieval step for notes questions."""
 
+import numpy as np
 from google import genai
 from google.genai import types
 
-from config import GEMINI_API_KEY, TEXT_MODEL
+from config import EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL
 
 _client = genai.Client(api_key=GEMINI_API_KEY)
+
+
+def embed(texts):
+    response = _client.models.embed_content(model=EMBED_MODEL, contents=texts)
+    vectors = [item.values for item in response.embeddings]
+    return np.array(vectors, dtype="float32")
 
 
 def generate(prompt):
