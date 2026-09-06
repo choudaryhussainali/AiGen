@@ -50,11 +50,8 @@ function renderMarkdown(text) {
       return;
     }
     if (inList) { html += "</ul>"; inList = false; }
-    if (trimmed.startsWith("## ")) {
-      html += "<h3>" + trimmed.slice(3) + "</h3>";
-    } else if (trimmed) {
-      html += "<p>" + trimmed + "</p>";
-    }
+    if (trimmed.startsWith("## ")) { html += "<h3>" + trimmed.slice(3) + "</h3>"; }
+    else if (trimmed) { html += "<p>" + trimmed + "</p>"; }
   });
   return inList ? html + "</ul>" : html;
 }
@@ -108,9 +105,7 @@ async function submitAuth(event) {
       errorLine.classList.add("is-success");
       errorLine.textContent = "Account created. You can log in now.";
     }
-  } catch (error) {
-    errorLine.textContent = error.message;
-  }
+  } catch (error) { errorLine.textContent = error.message; }
   button.disabled = false;
 }
 
