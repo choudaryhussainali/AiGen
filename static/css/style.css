@@ -90,3 +90,22 @@ img, svg { display: block; }
 }
 
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.auth-heading {
+  margin-top: 28px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.auth-form {
+  margin-top: var(--gap);
+  display: grid;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.auth-form .btn-primary { margin-top: 10px; }
