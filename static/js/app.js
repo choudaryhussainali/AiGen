@@ -21,6 +21,18 @@ const TOOLS = {
   topic: ["Topic Explainer", "Type any topic to get it explained in simple English."]
 };
 
+function switchTool(name) {
+  state.activeTool = name;
+  document.querySelectorAll(".nav-item").forEach(function (button) {
+    button.classList.toggle("active", button.dataset.tool === name);
+  });
+  document.querySelectorAll(".tool").forEach(function (section) {
+    section.classList.toggle("active", section.id === "tool-" + name);
+  });
+  document.getElementById("panel-title").textContent = TOOLS[name][0];
+  document.getElementById("panel-description").textContent = TOOLS[name][1];
+}
+
 function escapeHtml(text) {
   return text
     .replace(/&/g, "&amp;")
