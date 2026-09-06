@@ -23,9 +23,12 @@ def embed(texts):
     # The embedding endpoint accepts at most 100 items per request.
     vectors = []
     for start in range(0, len(texts), EMBED_BATCH):
-        response = _client.models.embed_content(
-            model=EMBED_MODEL, contents=texts[start:start + EMBED_BATCH]
-        )
+        try:
+            response = _client.models.embed_content(
+                model=EMBED_MODEL, contents=texts[start:start + EMBED_BATCH]
+            )
+        except Exception as error:
+            _raise_friendly(error)
         vectors.extend(item.values for item in response.embeddings)
     return np.array(vectors, dtype="float32")
 
