@@ -23,3 +23,11 @@ def create_session(email, access_token):
         "last_seen": now,
     }
     return session_id
+
+
+def wipe_session(session_id):
+    # Python cannot guarantee that freed memory is overwritten, so this is not
+    # a secure erase. What it does guarantee is that no study content was ever
+    # written to persistent storage and that every reference to it is dropped
+    # here, making it eligible for garbage collection.
+    _sessions.pop(session_id, None)
