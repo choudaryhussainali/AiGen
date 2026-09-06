@@ -151,6 +151,25 @@ def api_exam():
         return json_error(str(error), 500)
 
 
+@app.post("/api/paper/solve")
+def api_paper_solve():
+    try:
+        _, active = current_session()
+        if active is None:
+            return json_error("Not authenticated", 401)
+        upload = request.files.get("file")
+        if upload is None:
+            return json_error("Please choose a file first.")
+        message = "Please upload a JPG or PNG image."
+        data = read_upload(upload, (".jpg", ".jpeg", ".png"), message)
+        mime_type = "image/png" if upload.filename.lower().endswith(".png") else "image/jpeg"
+        return json_ok({"solution": ai.solve_paper(data, mime_type)})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
 @app.post("/api/video")
 def api_video():
     try:
