@@ -14,3 +14,19 @@ moment they log out.
 - **Video Summarizer** turns a YouTube link into a topic wise summary.
 - **Topic Explainer** explains any topic with a definition, an analogy and three
   key points.
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Language | Python 3.11 or newer |
+| Web framework | Flask 3, synchronous |
+| Templating | Jinja2 |
+| Frontend | HTML5, CSS3, vanilla JavaScript, no build step |
+| Auth | Supabase Python client, email and password |
+| LLM | Google Gemini via google-genai, text and vision |
+| Embeddings | Gemini embedding model |
+| Vector search | numpy cosine similarity over a list in RAM |
+| PDF text | pypdf |
+| Transcripts | youtube-transcript-api |
+| Sessions | Python dictionary in RAM |
