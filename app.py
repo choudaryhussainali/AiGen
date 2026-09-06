@@ -31,6 +31,8 @@ def api_signup():
         payload = request.get_json(silent=True) or {}
         email = (payload.get("email") or "").strip()
         password = payload.get("password") or ""
+        if not email or not password:
+            return json_error("Please enter something first.")
         auth.sign_up(email, password)
         return json_ok({"message": "Account created"})
     except ValueError as error:
