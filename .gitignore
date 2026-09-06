@@ -1,0 +1,9 @@
+.env
+.claude/
+AiGen_Master_Prompt.md
+__pycache__/
+*.pyc
+venv/
+.venv/
+.DS_Store
+*.log
