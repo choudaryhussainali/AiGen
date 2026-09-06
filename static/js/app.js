@@ -142,6 +142,26 @@ function setStatus(name, message) {
   document.getElementById(name + "-status").textContent = message;
 }
 
+async function runTopic() {
+  const button = document.getElementById("topic-button");
+  const topic = document.getElementById("topic-input").value.trim();
+  if (!topic) {
+    toast("Please enter something first.", "error");
+    return;
+  }
+  setLoading(button, true);
+  setStatus("topic", "Explaining the topic...");
+  try {
+    const data = await post("/api/topic", { topic: topic });
+    showOutput("topic", '<div class="output-card">' + renderMarkdown(data.explanation) + "</div>");
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError("topic", error.message);
+  }
+  setStatus("topic", "");
+  setLoading(button, false);
+}
+
 async function logout() {
   try {
     await post("/api/logout");
