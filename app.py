@@ -3,7 +3,7 @@ import io
 from flask import Flask, jsonify, redirect, render_template, request, session
 
 import config
-from services import ai, auth, documents, store
+from services import ai, auth, documents, store, youtube
 
 app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET_KEY
@@ -145,6 +145,25 @@ def api_exam():
         if not outline:
             return json_error("Please enter something first.")
         return json_ok({"plan": ai.build_exam_plan(outline)})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
+@app.post("/api/video")
+def api_video():
+    try:
+        _, active = current_session()
+        if active is None:
+            return json_error("Not authenticated", 401)
+        url = (request.get_json(silent=True) or {}).get("url", "").strip()
+        if not url:
+            return json_error("Please enter something first.")
+        video_id = youtube.extract_video_id(url)
+        transcript = youtube.fetch_transcript(video_id)
+        summary = ai.summarize_video(transcript)
+        return json_ok({"summary": summary, "title_id": video_id})
     except ValueError as error:
         return json_error(str(error))
     except Exception as error:
