@@ -28,7 +28,7 @@ moment they log out.
 | Embeddings | Gemini embedding model |
 | Vector search | numpy cosine similarity over a list in RAM |
 | PDF text | pypdf |
-| Transcripts | youtube-transcript-api |
+| Transcripts | youtube-transcript-api 1.2.4 or newer |
 | Sessions | Python dictionary in RAM |
 
 ## Setup
@@ -64,17 +64,15 @@ Leaving it on means a new user has to click the link in their inbox first.
 
 ## How Zero Persistence works
 
-Logging in creates an entry in a plain Python dictionary in `services/store.py`.
-That entry holds the user's email, their Supabase access token, and, once they
-upload a PDF, its text chunks and embeddings. Nothing study related is ever
-written to disk or to the database. Uploads are read from the request stream
-straight into memory. The browser cookie carries only the session id. Logging
-out deletes the whole dictionary entry, and any session untouched for 60 minutes
-is deleted on the next request that arrives.
-
-Python cannot guarantee that freed memory is overwritten, so this is not a
-secure erase. What it does guarantee is that the content never reaches
-persistent storage and that every reference to it is dropped.
+Logging in creates an entry in a plain Python dictionary in `services/store.py`,
+holding the user's email, their Supabase access token, and, once they upload a
+PDF, its text chunks and embeddings. Nothing study related is ever written to
+disk or to the database, uploads are read from the request stream straight into
+memory, and the browser cookie carries only the session id. Logging out deletes
+the whole entry, and any session untouched for 60 minutes is deleted on the next
+request. Python cannot guarantee that freed memory is overwritten, so this is not
+a secure erase, but the content never reaches persistent storage and every
+reference to it is dropped.
 
 ## Privacy scope
 
@@ -89,17 +87,16 @@ The original proposal named EasyOCR and Tesseract for reading past paper images.
 Neither is used here, because EasyOCR pulls in roughly 2 GB of PyTorch, needs
 model downloads, is slow on CPU, and still cannot read mathematical notation.
 Gemini vision reads the image directly, handles handwriting and formulas, and
-lets a single API call both read the question and solve it, which removes an
-entire dependency and an entire processing stage.
+lets one API call both read the question and solve it, which removes an entire
+dependency and an entire processing stage.
 
 ## Known limitations
 
 - English only. The prompts and the transcript lookup both assume English.
 - No chat history. Follow up answers are not remembered between questions.
-- One worker only. Sessions live in the memory of a single process, so in
-  production this must run under a single Gunicorn worker
-  (`gunicorn -w 1 app:app`). A second worker would not see the first one's
-  sessions.
+- One worker only. Sessions live in the memory of a single process, so production
+  needs a single Gunicorn worker (`gunicorn -w 1 app:app`). A second worker would
+  not see the first one's sessions.
 - Uploads are capped at 10 MB, for both PDFs and images.
 - Videos without subtitles cannot be summarised, because there is no transcript
   to read.
