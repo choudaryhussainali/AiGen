@@ -37,10 +37,7 @@ function switchTool(name) {
 }
 
 function escapeHtml(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function renderMarkdown(text) {
@@ -54,10 +51,7 @@ function renderMarkdown(text) {
       inList = true;
       return;
     }
-    if (inList) {
-      html += "</ul>";
-      inList = false;
-    }
+    if (inList) { html += "</ul>"; inList = false; }
     if (trimmed.startsWith("## ")) {
       html += "<h3>" + trimmed.slice(3) + "</h3>";
     } else if (trimmed) {
@@ -83,9 +77,7 @@ function toast(message, type) {
   node.className = type === "error" ? "toast is-error" : "toast";
   node.textContent = message;
   document.getElementById("toast-container").appendChild(node);
-  setTimeout(function () {
-    node.remove();
-  }, 3000);
+  setTimeout(function () { node.remove(); }, 3000);
 }
 
 function setAuthMode(mode) {
