@@ -198,6 +198,7 @@ function initDashboard() {
     });
   });
   document.getElementById("logout-button").addEventListener("click", logout);
+  document.getElementById("exam-button").addEventListener("click", runExam);
   document.getElementById("topic-button").addEventListener("click", runTopic);
   document.getElementById("topic-input").addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
