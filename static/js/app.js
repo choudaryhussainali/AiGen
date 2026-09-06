@@ -295,6 +295,16 @@ function initDashboard() {
     });
   });
   document.getElementById("logout-button").addEventListener("click", logout);
+  bindDropzone("notes", function (file) {
+    showChosenFile("notes", file);
+  });
+  document.getElementById("notes-button").addEventListener("click", runNotes);
+  document.getElementById("notes-ask-button").addEventListener("click", askNotes);
+  document.getElementById("notes-question").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      askNotes();
+    }
+  });
   document.getElementById("exam-button").addEventListener("click", runExam);
   document.getElementById("topic-button").addEventListener("click", runTopic);
   document.getElementById("topic-input").addEventListener("keydown", function (event) {
