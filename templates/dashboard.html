@@ -40,7 +40,17 @@
     </header>
 
     <section class="tool active" id="tool-notes"></section>
-    <section class="tool" id="tool-exam"></section>
+    <section class="tool" id="tool-exam">
+      <div class="tool-input">
+        <textarea class="textarea" id="exam-input"
+                  placeholder="Paste your course outline here, one topic per line."></textarea>
+        <button class="btn btn-primary" id="exam-button" type="button">Build study plan</button>
+      </div>
+      <p class="status-line" id="exam-status"></p>
+      <div class="tool-output" id="exam-output">
+        <p class="empty-state">Your study plan will appear here.</p>
+      </div>
+    </section>
     <section class="tool" id="tool-paper"></section>
     <section class="tool" id="tool-video"></section>
     <section class="tool" id="tool-topic">
