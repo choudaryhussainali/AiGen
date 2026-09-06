@@ -13,6 +13,14 @@ async function post(url, body) {
   return payload.data;
 }
 
+const TOOLS = {
+  notes: ["Notes Summarizer", "Upload a PDF, get a summary, then ask questions about it."],
+  exam: ["Exam Prep", "Paste a course outline for a topic by topic study plan."],
+  paper: ["Past Paper Solver", "Upload a question image and get worked solutions."],
+  video: ["Video Summarizer", "Paste a YouTube link for a topic wise summary."],
+  topic: ["Topic Explainer", "Type any topic to get it explained in simple English."]
+};
+
 function escapeHtml(text) {
   return text
     .replace(/&/g, "&amp;")
