@@ -13,3 +13,9 @@
   --gap: 16px;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); }
+button, input, textarea { font: inherit; color: inherit; }
+img, svg { display: block; }
