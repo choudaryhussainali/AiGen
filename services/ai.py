@@ -4,7 +4,7 @@ import numpy as np
 from google import genai
 from google.genai import types
 
-from config import EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL
+from config import EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL, TOP_K
 
 _client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -37,6 +37,14 @@ def generate_from_image(image_bytes, mime_type, prompt):
 def _normalise(matrix):
     lengths = np.linalg.norm(matrix, axis=1, keepdims=True)
     return matrix / np.maximum(lengths, 1e-10)
+
+
+def _top_chunks(question, chunks, embeddings):
+    """Cosine similarity is one dot product once both sides are normalised."""
+    query = _normalise(embed([question]))[0]
+    scores = _normalise(embeddings) @ query
+    best = np.argsort(scores)[::-1][:TOP_K]
+    return [chunks[index] for index in best]
 
 
 def summarize_notes(text):
