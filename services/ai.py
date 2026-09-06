@@ -14,6 +14,8 @@ def _raise_friendly(error):
     text = str(error)
     if "RESOURCE_EXHAUSTED" in text or "429" in text:
         raise ValueError("The AI service is busy right now. Please wait a minute.")
+    if "UNAVAILABLE" in text or "503" in text:
+        raise ValueError("The AI service is under heavy load. Please try again.")
     if "API key" in text or "PERMISSION_DENIED" in text:
         raise ValueError("The Gemini API key was rejected. Check your .env file.")
     raise error
