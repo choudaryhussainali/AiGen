@@ -178,6 +178,7 @@ function initDashboard() {
     });
   });
   document.getElementById("logout-button").addEventListener("click", logout);
+  document.getElementById("topic-button").addEventListener("click", runTopic);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
