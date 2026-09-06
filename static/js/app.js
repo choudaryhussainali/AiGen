@@ -1,3 +1,5 @@
+const state = { activeTool: "notes", hasDocument: false, authMode: "login" };
+
 async function post(url, body) {
   const response = await fetch(url, {
     method: "POST",
