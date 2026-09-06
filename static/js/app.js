@@ -259,6 +259,32 @@ async function runExam() {
   setLoading(button, false);
 }
 
+function showImagePreview(file) {
+  const preview = document.getElementById("paper-preview");
+  preview.src = URL.createObjectURL(file);
+  preview.hidden = false;
+}
+
+async function runPaper() {
+  const button = document.getElementById("paper-button");
+  const file = document.getElementById("paper-file").files[0];
+  if (!file) {
+    toast("Please choose a file first.", "error");
+    return;
+  }
+  setLoading(button, true);
+  setStatus("paper", "Scanning the image...");
+  try {
+    const data = await postFile("/api/paper/solve", file);
+    showOutput("paper", '<div class="output-card">' + renderMarkdown(data.solution) + "</div>");
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError("paper", error.message);
+  }
+  setStatus("paper", "");
+  setLoading(button, false);
+}
+
 async function runVideo() {
   const button = document.getElementById("video-button");
   const url = document.getElementById("video-input").value.trim();
