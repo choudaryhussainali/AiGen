@@ -39,7 +39,20 @@
       </p>
     </header>
 
-    <section class="tool active" id="tool-notes"></section>
+    <section class="tool active" id="tool-notes">
+      <div class="tool-input">
+        <label class="dropzone" id="notes-dropzone">
+          <span id="notes-dropzone-label">Drop a PDF here or click to choose one</span>
+          <span class="dropzone-hint">PDF only, maximum 10 MB</span>
+          <input type="file" id="notes-file" accept="application/pdf" hidden>
+        </label>
+        <button class="btn btn-primary" id="notes-button" type="button">Summarise notes</button>
+      </div>
+      <p class="status-line" id="notes-status"></p>
+      <div class="tool-output" id="notes-output">
+        <p class="empty-state">Your summary will appear here.</p>
+      </div>
+    </section>
     <section class="tool" id="tool-exam">
       <div class="tool-input">
         <textarea class="textarea" id="exam-input"
