@@ -71,7 +71,17 @@
       </div>
     </section>
     <section class="tool" id="tool-paper"></section>
-    <section class="tool" id="tool-video"></section>
+    <section class="tool" id="tool-video">
+      <div class="tool-input">
+        <input class="input" id="video-input" type="url"
+               placeholder="https://www.youtube.com/watch?v=...">
+        <button class="btn btn-primary" id="video-button" type="button">Summarise video</button>
+      </div>
+      <p class="status-line" id="video-status"></p>
+      <div class="tool-output" id="video-output">
+        <p class="empty-state">Your video summary will appear here.</p>
+      </div>
+    </section>
     <section class="tool" id="tool-topic">
       <div class="tool-input">
         <input class="input" id="topic-input" type="text"
