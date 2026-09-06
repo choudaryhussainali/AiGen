@@ -326,6 +326,12 @@ function initDashboard() {
     }
   });
   document.getElementById("exam-button").addEventListener("click", runExam);
+  document.getElementById("video-button").addEventListener("click", runVideo);
+  document.getElementById("video-input").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      runVideo();
+    }
+  });
   document.getElementById("topic-button").addEventListener("click", runTopic);
   document.getElementById("topic-input").addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
