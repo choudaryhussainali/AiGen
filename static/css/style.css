@@ -221,3 +221,12 @@ img, svg { display: block; }
   from { transform: translateY(8px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.status-line {
+  margin-bottom: 10px;
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.output-error { color: var(--danger); font-size: 14px; }
