@@ -335,41 +335,41 @@ async function logout() {
   window.location = "/";
 }
 
+function onClick(id, handler) {
+  document.getElementById(id).addEventListener("click", handler);
+}
+
+function onEnter(id, handler) {
+  document.getElementById(id).addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      handler();
+    }
+  });
+}
+
 function initDashboard() {
   document.querySelectorAll(".nav-item").forEach(function (button) {
     button.addEventListener("click", function () {
       switchTool(button.dataset.tool);
     });
   });
-  document.getElementById("logout-button").addEventListener("click", logout);
   bindDropzone("notes", function (file) {
     showChosenFile("notes", file);
   });
-  document.getElementById("notes-button").addEventListener("click", runNotes);
-  document.getElementById("notes-ask-button").addEventListener("click", askNotes);
-  document.getElementById("notes-question").addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      askNotes();
-    }
-  });
-  document.getElementById("exam-button").addEventListener("click", runExam);
   bindDropzone("paper", function (file) {
     showChosenFile("paper", file);
     showImagePreview(file);
   });
-  document.getElementById("paper-button").addEventListener("click", runPaper);
-  document.getElementById("video-button").addEventListener("click", runVideo);
-  document.getElementById("video-input").addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      runVideo();
-    }
-  });
-  document.getElementById("topic-button").addEventListener("click", runTopic);
-  document.getElementById("topic-input").addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      runTopic();
-    }
-  });
+  onClick("logout-button", logout);
+  onClick("notes-button", runNotes);
+  onClick("notes-ask-button", askNotes);
+  onClick("exam-button", runExam);
+  onClick("paper-button", runPaper);
+  onClick("video-button", runVideo);
+  onClick("topic-button", runTopic);
+  onEnter("notes-question", askNotes);
+  onEnter("video-input", runVideo);
+  onEnter("topic-input", runTopic);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
