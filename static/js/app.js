@@ -13,6 +13,17 @@ async function post(url, body) {
   return payload.data;
 }
 
+function setLoading(button, isLoading) {
+  if (isLoading) {
+    button.dataset.label = button.textContent;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner"></span>' + button.dataset.label;
+  } else {
+    button.disabled = false;
+    button.textContent = button.dataset.label || button.textContent;
+  }
+}
+
 function toast(message, type) {
   const node = document.createElement("div");
   node.className = type === "error" ? "toast is-error" : "toast";
