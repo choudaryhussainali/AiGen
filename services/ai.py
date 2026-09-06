@@ -34,6 +34,11 @@ def generate_from_image(image_bytes, mime_type, prompt):
     return text
 
 
+def _normalise(matrix):
+    lengths = np.linalg.norm(matrix, axis=1, keepdims=True)
+    return matrix / np.maximum(lengths, 1e-10)
+
+
 def summarize_notes(text):
     prompt = f"""Summarise these lecture notes for a student revising them.
 
