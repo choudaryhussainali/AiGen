@@ -82,3 +82,12 @@ persistent storage and that every reference to it is dropped.
 > in server RAM only, is never written to disk or to the database, and is
 > destroyed on logout. Content sent to the Google Gemini API for inference is
 > governed by Google's API terms, which are outside AiGen's control.
+
+## Design deviation from proposal
+
+The original proposal named EasyOCR and Tesseract for reading past paper images.
+Neither is used here, because EasyOCR pulls in roughly 2 GB of PyTorch, needs
+model downloads, is slow on CPU, and still cannot read mathematical notation.
+Gemini vision reads the image directly, handles handwriting and formulas, and
+lets a single API call both read the question and solve it, which removes an
+entire dependency and an entire processing stage.
