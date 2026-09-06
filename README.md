@@ -96,5 +96,6 @@ dependency and an entire processing stage.
   not see the first one's sessions.
 - Uploads are capped at 10 MB, for both PDFs and images.
 - Videos without subtitles cannot be summarised, there is no transcript to read.
-- On the Gemini free tier the embedding endpoint allows 100 requests a minute, so
-  a very large PDF can hit that limit and ask you to retry.
+- The Gemini free tier is small. It allows 20 `gemini-2.5-flash` requests a day
+  and 100 embedding requests a minute, so a day of testing can use it up. Enable
+  billing on the Google Cloud project behind the key to lift both.
