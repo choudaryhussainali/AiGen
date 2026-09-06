@@ -267,24 +267,17 @@ function showImagePreview(file) {
   preview.hidden = false;
 }
 
-async function runPaper() {
-  const button = document.getElementById("paper-button");
+function runPaper() {
   const file = document.getElementById("paper-file").files[0];
   if (!file) {
     toast("Please choose a file first.", "error");
     return;
   }
-  setLoading(button, true);
-  setStatus("paper", "Scanning the image...");
-  try {
+  const job = { button: "paper-button", tool: "paper", output: "paper", status: "Scanning the image..." };
+  runTool(job, async function () {
     const data = await postFile("/api/paper/solve", file);
-    showOutput("paper", '<div class="output-card">' + renderMarkdown(data.solution) + "</div>");
-  } catch (error) {
-    toast(error.message, "error");
-    showOutputError("paper", error.message);
-  }
-  setStatus("paper", "");
-  setLoading(button, false);
+    showCard("paper", renderMarkdown(data.solution));
+  });
 }
 
 async function runVideo() {
