@@ -24,3 +24,26 @@ function setAuthMode(mode) {
   document.getElementById("auth-switch-link").textContent = isLogin ? "Create account" : "Log in";
   document.getElementById("auth-error").textContent = "";
 }
+
+async function submitAuth(event) {
+  event.preventDefault();
+  const errorLine = document.getElementById("auth-error");
+  const button = document.getElementById("auth-submit");
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  errorLine.textContent = "";
+  button.disabled = true;
+  try {
+    if (state.authMode === "login") {
+      await post("/api/login", { email: email, password: password });
+      window.location = "/dashboard";
+    } else {
+      await post("/api/signup", { email: email, password: password });
+      setAuthMode("login");
+      errorLine.textContent = "Account created. You can log in now.";
+    }
+  } catch (error) {
+    errorLine.textContent = error.message;
+  }
+  button.disabled = false;
+}
