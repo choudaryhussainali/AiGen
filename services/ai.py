@@ -34,6 +34,23 @@ def generate_from_image(image_bytes, mime_type, prompt):
     return text
 
 
+def build_exam_plan(outline):
+    prompt = f"""You are helping a university student prepare for an exam.
+
+Course outline:
+{outline}
+
+Break the outline into its topics. For every topic write:
+## Topic name
+A short paragraph explaining what the topic covers.
+- **Focus on:** the parts most likely to be examined
+- **Common mistakes:** what students usually get wrong
+
+Cover every topic in the outline and add nothing that is not in it.
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+    return generate(prompt)
+
+
 def explain_topic(topic):
     prompt = f"""Explain the topic below to a university student in simple English.
 
