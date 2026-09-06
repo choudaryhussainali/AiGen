@@ -9,6 +9,16 @@ from config import EMBED_BATCH, EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL, TOP_K
 _client = genai.Client(api_key=GEMINI_API_KEY)
 
 
+def _raise_friendly(error):
+    """Gemini quota and safety errors reach the user as readable sentences."""
+    text = str(error)
+    if "RESOURCE_EXHAUSTED" in text or "429" in text:
+        raise ValueError("The AI service is busy right now. Please wait a minute.")
+    if "API key" in text or "PERMISSION_DENIED" in text:
+        raise ValueError("The Gemini API key was rejected. Check your .env file.")
+    raise error
+
+
 def embed(texts):
     # The embedding endpoint accepts at most 100 items per request.
     vectors = []
