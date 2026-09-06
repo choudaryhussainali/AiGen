@@ -130,8 +130,19 @@ function initAuthPage() {
   });
 }
 
+function initDashboard() {
+  document.querySelectorAll(".nav-item").forEach(function (button) {
+    button.addEventListener("click", function () {
+      switchTool(button.dataset.tool);
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   if (document.getElementById("auth-form")) {
     initAuthPage();
+  }
+  if (document.querySelector(".dashboard")) {
+    initDashboard();
   }
 });
