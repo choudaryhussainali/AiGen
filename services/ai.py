@@ -4,14 +4,19 @@ import numpy as np
 from google import genai
 from google.genai import types
 
-from config import EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL, TOP_K
+from config import EMBED_BATCH, EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL, TOP_K
 
 _client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 def embed(texts):
-    response = _client.models.embed_content(model=EMBED_MODEL, contents=texts)
-    vectors = [item.values for item in response.embeddings]
+    # The embedding endpoint accepts at most 100 items per request.
+    vectors = []
+    for start in range(0, len(texts), EMBED_BATCH):
+        response = _client.models.embed_content(
+            model=EMBED_MODEL, contents=texts[start:start + EMBED_BATCH]
+        )
+        vectors.extend(item.values for item in response.embeddings)
     return np.array(vectors, dtype="float32")
 
 
