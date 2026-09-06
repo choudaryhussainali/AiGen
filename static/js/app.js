@@ -86,6 +86,7 @@ function setAuthMode(mode) {
   document.getElementById("auth-switch-text").textContent = isLogin ? "New to AiGen?" : "Already have an account?";
   document.getElementById("auth-switch-link").textContent = isLogin ? "Create account" : "Log in";
   document.getElementById("auth-error").textContent = "";
+  document.getElementById("password").autocomplete = isLogin ? "current-password" : "new-password";
 }
 
 async function submitAuth(event) {
