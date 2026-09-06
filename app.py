@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect, render_template, request, session
 
 import config
-from services import auth, store
+from services import ai, auth, store
 
 app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET_KEY
@@ -72,6 +72,22 @@ def api_login():
             account["email"], account["access_token"]
         )
         return json_ok({"email": account["email"]})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
+@app.post("/api/topic")
+def api_topic():
+    try:
+        _, active = current_session()
+        if active is None:
+            return json_error("Not authenticated", 401)
+        topic = (request.get_json(silent=True) or {}).get("topic", "").strip()
+        if not topic:
+            return json_error("Please enter something first.")
+        return json_ok({"explanation": ai.explain_topic(topic)})
     except ValueError as error:
         return json_error(str(error))
     except Exception as error:
