@@ -91,9 +91,8 @@ dependency and an entire processing stage.
 
 - English only, in both the prompts and the transcript lookup.
 - No chat history, follow up answers are not remembered between questions.
-- One worker only. Sessions live in the memory of a single process, so production
-  needs a single Gunicorn worker (`gunicorn -w 1 app:app`). A second worker would
-  not see the first one's sessions.
+- One worker only. Sessions live in one process's memory, so production needs a
+  single Gunicorn worker (`gunicorn -w 1 app:app`); a second would not see them.
 - Uploads are capped at 10 MB, for both PDFs and images.
 - Videos without subtitles cannot be summarised, there is no transcript to read.
 - The Gemini free tier is small. It allows 20 `gemini-2.5-flash` requests a day
