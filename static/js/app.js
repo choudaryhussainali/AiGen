@@ -146,6 +146,20 @@ function setStatus(name, message) {
   document.getElementById(name + "-status").textContent = message;
 }
 
+async function runTool(job, action) {
+  const button = document.getElementById(job.button);
+  setLoading(button, true);
+  setStatus(job.tool, job.status);
+  try {
+    await action();
+  } catch (error) {
+    toast(error.message, "error");
+    showOutputError(job.output, error.message);
+  }
+  setStatus(job.tool, "");
+  setLoading(button, false);
+}
+
 async function postFile(url, file) {
   const form = new FormData();
   form.append("file", file);
