@@ -114,6 +114,27 @@ def api_notes_upload():
         return json_error(str(error), 500)
 
 
+@app.post("/api/notes/ask")
+def api_notes_ask():
+    try:
+        _, active = current_session()
+        if active is None:
+            return json_error("Not authenticated", 401)
+        question = (request.get_json(silent=True) or {}).get("question", "").strip()
+        if not question:
+            return json_error("Please enter something first.")
+        if not active["chunks"]:
+            return json_error("Upload a PDF before asking questions.")
+        answer, pages = ai.answer_from_notes(
+            question, active["chunks"], active["embeddings"]
+        )
+        return json_ok({"answer": answer, "pages": pages})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
 @app.post("/api/exam")
 def api_exam():
     try:
