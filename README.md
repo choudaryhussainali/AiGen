@@ -45,3 +45,19 @@ python app.py
 
 Fill the four values in `.env` before starting the server, then open
 http://127.0.0.1:5000 in a browser.
+
+## Where the keys come from
+
+| Variable | Where to get it |
+|---|---|
+| `FLASK_SECRET_KEY` | Any random string you invent |
+| `SUPABASE_URL` | Supabase dashboard, Project Settings, API |
+| `SUPABASE_KEY` | Same page, the **anon public** key, never `service_role` |
+| `GEMINI_API_KEY` | https://aistudio.google.com/apikey |
+
+The Supabase key used on the server is the anon public key, which is safe to use
+from application code because row level security governs what it can reach.
+
+In the Supabase dashboard under Authentication, Providers, Email, turn
+"Confirm email" off if you want new accounts to be able to log in straight away.
+Leaving it on means a new user has to click the link in their inbox first.
