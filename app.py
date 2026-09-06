@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect, render_template, request, session
 
 import config
-from services import ai, auth, store
+from services import ai, auth, documents, store
 
 app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET_KEY
@@ -72,6 +72,28 @@ def api_login():
             account["email"], account["access_token"]
         )
         return json_ok({"email": account["email"]})
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception as error:
+        return json_error(str(error), 500)
+
+
+@app.post("/api/notes/upload")
+def api_notes_upload():
+    try:
+        session_id, active = current_session()
+        if active is None:
+            return json_error("Not authenticated", 401)
+        upload = request.files.get("file")
+        if upload is None:
+            return json_error("Please choose a file first.")
+        pages = documents.extract_pdf_pages(upload.stream)
+        chunks = documents.chunk_pages(pages)
+        store.set_document(session_id, chunks, None, upload.filename)
+        summary = ai.summarize_notes("\n".join(page["text"] for page in pages))
+        return json_ok(
+            {"summary": summary, "filename": upload.filename, "pages": len(pages)}
+        )
     except ValueError as error:
         return json_error(str(error))
     except Exception as error:
