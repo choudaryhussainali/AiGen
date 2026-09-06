@@ -2,9 +2,7 @@ const state = { activeTool: "notes", hasDocument: false, authMode: "login" };
 
 async function unwrap(response) {
   const payload = await response.json();
-  if (!payload.ok) {
-    throw new Error(payload.error);
-  }
+  if (!payload.ok) { throw new Error(payload.error); }
   return payload.data;
 }
 
@@ -125,20 +123,12 @@ function initAuthPage() {
   });
 }
 
-function showOutput(name, html) {
-  document.getElementById(name + "-output").innerHTML = html;
-}
-
-function showCard(name, html) {
-  showOutput(name, '<div class="output-card">' + html + "</div>");
-}
+function showOutput(name, html) { document.getElementById(name + "-output").innerHTML = html; }
+function showCard(name, html) { showOutput(name, '<div class="output-card">' + html + "</div>"); }
+function setStatus(name, text) { document.getElementById(name + "-status").textContent = text; }
 
 function showOutputError(name, message) {
   showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>");
-}
-
-function setStatus(name, message) {
-  document.getElementById(name + "-status").textContent = message;
 }
 
 async function runTool(job, action) {
@@ -200,14 +190,11 @@ function runNotes() {
 }
 
 function citationHtml(pages) {
-  if (!pages.length) {
-    return "";
-  }
+  if (!pages.length) { return ""; }
   const badges = pages.map(function (page) {
     return '<span class="citation">page ' + page + "</span>";
   });
-  return '<div class="citations"><span class="citation-label">Source:</span>'
-    + badges.join("") + "</div>";
+  return '<div class="citations"><span class="citation-label">Source:</span>' + badges.join("") + "</div>";
 }
 
 function askNotes() {
@@ -282,9 +269,7 @@ async function logout() {
   window.location = "/";
 }
 
-function onClick(id, handler) {
-  document.getElementById(id).addEventListener("click", handler);
-}
+function onClick(id, handler) { document.getElementById(id).addEventListener("click", handler); }
 
 function onEnter(id, handler) {
   document.getElementById(id).addEventListener("keydown", function (event) {
