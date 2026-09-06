@@ -34,6 +34,20 @@ def generate_from_image(image_bytes, mime_type, prompt):
     return text
 
 
+def summarize_notes(text):
+    prompt = f"""Summarise these lecture notes for a student revising them.
+
+Notes:
+{text}
+
+Write the summary as bullet points only. Group them under "## " headings when
+the notes cover more than one theme. Start every bullet with "- " and use
+**bold** for the key terms. Keep each bullet to one sentence.
+
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+    return generate(prompt)
+
+
 def build_exam_plan(outline):
     prompt = f"""You are helping a university student prepare for an exam.
 
