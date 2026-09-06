@@ -200,29 +200,21 @@ function showChosenFile(name, file) {
   document.getElementById(name + "-dropzone-label").textContent = file.name;
 }
 
-async function runNotes() {
-  const button = document.getElementById("notes-button");
+function runNotes() {
   const file = document.getElementById("notes-file").files[0];
   if (!file) {
     toast("Please choose a file first.", "error");
     return;
   }
-  setLoading(button, true);
-  setStatus("notes", "Reading your PDF...");
-  try {
+  const job = { button: "notes-button", tool: "notes", output: "notes", status: "Reading your PDF..." };
+  runTool(job, async function () {
     const data = await postFile("/api/notes/upload", file);
-    setStatus("notes", "Indexing " + data.pages + " pages...");
-    showOutput("notes", '<div class="output-card">' + renderMarkdown(data.summary) + "</div>");
+    showCard("notes", renderMarkdown(data.summary));
     state.hasDocument = true;
     document.getElementById("notes-followup").hidden = false;
     showOutput("notes-answer", "");
     toast(data.filename + " summarised from " + data.pages + " pages");
-  } catch (error) {
-    toast(error.message, "error");
-    showOutputError("notes", error.message);
-  }
-  setStatus("notes", "");
-  setLoading(button, false);
+  });
 }
 
 function citationHtml(pages) {
