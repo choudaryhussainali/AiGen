@@ -311,3 +311,14 @@ img, svg { display: block; }
   font-size: 13px;
   color: var(--text-muted);
 }
+
+.tool { display: none; }
+.tool.active { display: block; }
+
+.tool-input {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.tool-input .btn-primary { justify-self: start; }
