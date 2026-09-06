@@ -19,3 +19,13 @@ def _friendly_error(error):
     if "email" in text and "valid" in text:
         return "Please enter a valid email address."
     return "Something went wrong. Please try again."
+
+
+def sign_up(email, password):
+    try:
+        result = _client.auth.sign_up({"email": email, "password": password})
+    except Exception as error:
+        raise ValueError(_friendly_error(error))
+    if result.user is None:
+        raise ValueError("Could not create that account.")
+    return {"email": result.user.email}
