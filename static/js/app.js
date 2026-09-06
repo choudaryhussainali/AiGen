@@ -130,6 +130,18 @@ function initAuthPage() {
   });
 }
 
+function showOutput(name, html) {
+  document.getElementById(name + "-output").innerHTML = html;
+}
+
+function showOutputError(name, message) {
+  showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>");
+}
+
+function setStatus(name, message) {
+  document.getElementById(name + "-status").textContent = message;
+}
+
 async function logout() {
   try {
     await post("/api/logout");
