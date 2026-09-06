@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask, jsonify, session
 
 import config
 from services import store
@@ -7,6 +7,14 @@ app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET_KEY
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
+
+def json_ok(data):
+    return jsonify({"ok": True, "data": data})
+
+
+def json_error(message, status=400):
+    return jsonify({"ok": False, "error": message}), status
 
 
 def current_session():
