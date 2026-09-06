@@ -23,12 +23,15 @@ def json_error(message, status=400):
     return jsonify({"ok": False, "error": message}), status
 
 
+TOO_LARGE = f"File is too large. Maximum size is {config.MAX_FILE_MB} MB."
+
+
 def get_upload():
     """Touching request.files raises 413 once the body passes the size cap."""
     try:
         return request.files.get("file")
     except RequestEntityTooLarge:
-        raise ValueError("File is too large. Maximum size is 10 MB.")
+        raise ValueError(TOO_LARGE)
 
 
 def read_upload(upload, extensions, format_message):
@@ -37,7 +40,7 @@ def read_upload(upload, extensions, format_message):
         raise ValueError(format_message)
     data = upload.read()
     if len(data) > config.MAX_FILE_MB * 1024 * 1024:
-        raise ValueError("File is too large. Maximum size is 10 MB.")
+        raise ValueError(TOO_LARGE)
     return data
 
 
