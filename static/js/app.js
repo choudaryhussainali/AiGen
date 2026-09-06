@@ -142,6 +142,17 @@ function setStatus(name, message) {
   document.getElementById(name + "-status").textContent = message;
 }
 
+async function postFile(url, file) {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await fetch(url, { method: "POST", body: form });
+  const payload = await response.json();
+  if (!payload.ok) {
+    throw new Error(payload.error);
+  }
+  return payload.data;
+}
+
 async function runExam() {
   const button = document.getElementById("exam-button");
   const outline = document.getElementById("exam-input").value.trim();
