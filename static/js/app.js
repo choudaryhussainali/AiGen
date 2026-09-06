@@ -13,6 +13,13 @@ async function post(url, body) {
   return payload.data;
 }
 
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function setLoading(button, isLoading) {
   if (isLoading) {
     button.dataset.label = button.textContent;
