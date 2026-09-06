@@ -196,6 +196,7 @@ async function runNotes() {
     showOutput("notes", '<div class="output-card">' + renderMarkdown(data.summary) + "</div>");
     state.hasDocument = true;
     document.getElementById("notes-followup").hidden = false;
+    showOutput("notes-answer", "");
     toast(data.filename + " summarised from " + data.pages + " pages");
   } catch (error) {
     toast(error.message, "error");
