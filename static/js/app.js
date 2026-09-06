@@ -352,6 +352,11 @@ function initDashboard() {
     }
   });
   document.getElementById("exam-button").addEventListener("click", runExam);
+  bindDropzone("paper", function (file) {
+    showChosenFile("paper", file);
+    showImagePreview(file);
+  });
+  document.getElementById("paper-button").addEventListener("click", runPaper);
   document.getElementById("video-button").addEventListener("click", runVideo);
   document.getElementById("video-input").addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
