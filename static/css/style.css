@@ -109,3 +109,19 @@ img, svg { display: block; }
 }
 
 .auth-form .btn-primary { margin-top: 10px; }
+
+.auth-error {
+  margin-top: 12px;
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.auth-switch {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.auth-switch a { color: var(--accent); text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }
