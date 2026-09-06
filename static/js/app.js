@@ -1,16 +1,19 @@
 const state = { activeTool: "notes", hasDocument: false, authMode: "login" };
 
-async function post(url, body) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body || {})
-  });
+async function unwrap(response) {
   const payload = await response.json();
   if (!payload.ok) {
     throw new Error(payload.error);
   }
   return payload.data;
+}
+
+async function post(url, body) {
+  return unwrap(await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body || {})
+  }));
 }
 
 const TOOLS = {
@@ -163,12 +166,7 @@ async function runTool(job, action) {
 async function postFile(url, file) {
   const form = new FormData();
   form.append("file", file);
-  const response = await fetch(url, { method: "POST", body: form });
-  const payload = await response.json();
-  if (!payload.ok) {
-    throw new Error(payload.error);
-  }
-  return payload.data;
+  return unwrap(await fetch(url, { method: "POST", body: form }));
 }
 
 function bindDropzone(name, onFile) {
