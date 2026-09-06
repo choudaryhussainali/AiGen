@@ -13,6 +13,16 @@ async function post(url, body) {
   return payload.data;
 }
 
+function toast(message, type) {
+  const node = document.createElement("div");
+  node.className = type === "error" ? "toast is-error" : "toast";
+  node.textContent = message;
+  document.getElementById("toast-container").appendChild(node);
+  setTimeout(function () {
+    node.remove();
+  }, 3000);
+}
+
 function setAuthMode(mode) {
   state.authMode = mode;
   const isLogin = mode === "login";
