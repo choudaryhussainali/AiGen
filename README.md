@@ -2,8 +2,8 @@
 
 AiGen is a web app that puts five AI study tools behind one login. It is built
 with Flask, vanilla HTML, CSS and JavaScript, and Google Gemini. Every piece of
-study content a user uploads lives in server RAM only and is destroyed the
-moment they log out.
+study content a user uploads lives in server RAM only and is destroyed the moment
+they log out.
 
 ## The five tools
 
@@ -55,12 +55,11 @@ http://127.0.0.1:5000 in a browser.
 | `SUPABASE_KEY` | Same page, the **anon public** key, never `service_role` |
 | `GEMINI_API_KEY` | https://aistudio.google.com/apikey |
 
-The Supabase key used on the server is the anon public key, which is safe to use
-from application code because row level security governs what it can reach.
-
-In the Supabase dashboard under Authentication, Providers, Email, turn
-"Confirm email" off if you want new accounts to be able to log in straight away.
-Leaving it on means a new user has to click the link in their inbox first.
+The key used on the server is the anon public key, which is safe in application
+code because row level security governs what it can reach. In the Supabase
+dashboard under Authentication, Providers, Email, turn "Confirm email" off if you
+want new accounts to log in straight away, otherwise a new user has to click the
+link in their inbox first.
 
 ## How Zero Persistence works
 
@@ -92,13 +91,12 @@ dependency and an entire processing stage.
 
 ## Known limitations
 
-- English only. The prompts and the transcript lookup both assume English.
-- No chat history. Follow up answers are not remembered between questions.
+- English only, in both the prompts and the transcript lookup.
+- No chat history, follow up answers are not remembered between questions.
 - One worker only. Sessions live in the memory of a single process, so production
   needs a single Gunicorn worker (`gunicorn -w 1 app:app`). A second worker would
   not see the first one's sessions.
 - Uploads are capped at 10 MB, for both PDFs and images.
-- Videos without subtitles cannot be summarised, because there is no transcript
-  to read.
-- On the Gemini free tier the embedding endpoint allows 100 requests a minute,
-  so a very large PDF can hit that limit and ask you to retry.
+- Videos without subtitles cannot be summarised, there is no transcript to read.
+- On the Gemini free tier the embedding endpoint allows 100 requests a minute, so
+  a very large PDF can hit that limit and ask you to retry.
