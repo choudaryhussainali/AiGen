@@ -164,24 +164,19 @@ async function postFile(url, file) {
 function bindDropzone(name, onFile) {
   const zone = document.getElementById(name + "-dropzone");
   const input = document.getElementById(name + "-file");
-  input.addEventListener("change", function () {
-    if (input.files[0]) {
-      onFile(input.files[0]);
-    }
-  });
+  const choose = function () {
+    if (input.files[0]) { onFile(input.files[0]); }
+  };
+  input.addEventListener("change", choose);
+  zone.addEventListener("dragleave", function () { zone.classList.remove("is-active"); });
   zone.addEventListener("dragover", function (event) {
     event.preventDefault();
     zone.classList.add("is-active");
   });
-  zone.addEventListener("dragleave", function () {
-    zone.classList.remove("is-active");
-  });
   zone.addEventListener("drop", function (event) {
     event.preventDefault();
     input.files = event.dataTransfer.files;
-    if (input.files[0]) {
-      onFile(input.files[0]);
-    }
+    choose();
   });
 }
 
