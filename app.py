@@ -23,11 +23,6 @@ def json_error(message, status=400):
     return jsonify({"ok": False, "error": message}), status
 
 
-@app.errorhandler(413)
-def too_large(error):
-    return json_error("File is too large. Maximum size is 10 MB.", 413)
-
-
 def get_upload():
     """Touching request.files raises 413 once the body passes the size cap."""
     try:
