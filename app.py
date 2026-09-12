@@ -207,7 +207,7 @@ def api_video():
         video_id = youtube.extract_video_id(url)
         transcript = youtube.fetch_transcript(video_id)
         summary = ai.summarize_video(transcript[:config.MAX_SUMMARY_CHARS])
-        return json_ok({"summary": summary, "title_id": video_id})
+        return json_ok({"summary": summary, "video_id": video_id})
     except ValueError as error:
         return json_error(str(error))
     except Exception:
