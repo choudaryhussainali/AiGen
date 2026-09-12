@@ -200,7 +200,7 @@ def api_video():
             return json_error("Please enter something first.")
         video_id = youtube.extract_video_id(url)
         transcript = youtube.fetch_transcript(video_id)
-        summary = ai.summarize_video(transcript)
+        summary = ai.summarize_video(transcript[:config.MAX_SUMMARY_CHARS])
         return json_ok({"summary": summary, "title_id": video_id})
     except ValueError as error:
         return json_error(str(error))
