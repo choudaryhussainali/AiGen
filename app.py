@@ -119,7 +119,8 @@ def api_notes_upload():
         chunks = documents.chunk_pages(pages)
         embeddings = ai.embed_documents([chunk["text"] for chunk in chunks])
         store.set_document(session_id, chunks, embeddings, upload.filename)
-        summary = ai.summarize_notes("\n".join(page["text"] for page in pages))
+        full_text = "\n".join(page["text"] for page in pages)
+        summary = ai.summarize_notes(full_text[:config.MAX_SUMMARY_CHARS])
         return json_ok(
             {"summary": summary, "filename": upload.filename, "pages": len(pages)}
         )

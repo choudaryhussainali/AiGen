@@ -18,6 +18,7 @@ VISION_MODEL = "qwen/qwen3.8-27b"
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 MAX_FILE_MB = 10
+MAX_SUMMARY_CHARS = 12000
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 TOP_K = 4
