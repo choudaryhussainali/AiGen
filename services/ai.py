@@ -1,12 +1,26 @@
 """All Gemini calls plus the retrieval step for notes questions."""
 
 import numpy as np
+from fastembed import TextEmbedding
 from google import genai
 from google.genai import types
 
-from config import EMBED_BATCH, EMBED_MODEL, GEMINI_API_KEY, TEXT_MODEL, TOP_K
+import config
 
-_client = genai.Client(api_key=GEMINI_API_KEY)
+# Constructed once at import. The first run downloads roughly 130 MB and caches it,
+# every run after that is offline and has no request limit at all.
+_embedder = TextEmbedding(model_name=config.EMBED_MODEL)
+
+
+def embed_documents(texts):
+    return np.array(list(_embedder.embed(texts)), dtype="float32")
+
+
+def embed_query(text):
+    return np.array(list(_embedder.query_embed([text]))[0], dtype="float32")
+
+
+_client = genai.Client(api_key=config.GEMINI_API_KEY)
 
 
 def _raise_friendly(error):
@@ -24,23 +38,9 @@ def _raise_friendly(error):
     raise error
 
 
-def embed(texts):
-    # The embedding endpoint accepts at most 100 items per request.
-    vectors = []
-    for start in range(0, len(texts), EMBED_BATCH):
-        try:
-            response = _client.models.embed_content(
-                model=EMBED_MODEL, contents=texts[start:start + EMBED_BATCH]
-            )
-        except Exception as error:
-            _raise_friendly(error)
-        vectors.extend(item.values for item in response.embeddings)
-    return np.array(vectors, dtype="float32")
-
-
 def generate(prompt):
     try:
-        response = _client.models.generate_content(model=TEXT_MODEL, contents=prompt)
+        response = _client.models.generate_content(model=config.TEXT_MODEL, contents=prompt)
     except Exception as error:
         _raise_friendly(error)
     text = (response.text or "").strip()
@@ -53,7 +53,7 @@ def generate_from_image(image_bytes, mime_type, prompt):
     part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
     try:
         response = _client.models.generate_content(
-            model=TEXT_MODEL, contents=[part, prompt]
+            model=config.TEXT_MODEL, contents=[part, prompt]
         )
     except Exception as error:
         _raise_friendly(error)
@@ -70,9 +70,9 @@ def _normalise(matrix):
 
 def _top_chunks(question, chunks, embeddings):
     """Cosine similarity is one dot product once both sides are normalised."""
-    query = _normalise(embed([question]))[0]
+    query = _normalise(np.atleast_2d(embed_query(question)))[0]
     scores = _normalise(embeddings) @ query
-    best = np.argsort(scores)[::-1][:TOP_K]
+    best = np.argsort(scores)[::-1][:config.TOP_K]
     return [chunks[index] for index in best]
 
 
