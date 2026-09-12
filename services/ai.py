@@ -124,7 +124,7 @@ A short paragraph explaining what the topic covers.
 
 Cover every topic in the outline and add nothing that is not in it.
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
-    return generate(prompt)
+    return generate(prompt, config.SUMMARY_MODEL)
 
 
 def solve_paper(image_bytes, mime_type):
