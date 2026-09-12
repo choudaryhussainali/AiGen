@@ -11,7 +11,9 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 REQUEST_TIMEOUT_SECONDS = 120
 
+# Long summaries go to the larger model, short answers stay on the fast one.
 TEXT_MODEL = "openai/gpt-oss-20b"
+SUMMARY_MODEL = "openai/gpt-oss-120b"
 VISION_MODEL = "qwen/qwen3.8-27b"
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 

@@ -87,7 +87,7 @@ the notes cover more than one theme. Start every bullet with "- " and use
 **bold** for the key terms. Keep each bullet to one sentence.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
-    return generate(prompt)
+    return generate(prompt, config.SUMMARY_MODEL)
 
 
 def answer_from_notes(question, chunks, embeddings):
