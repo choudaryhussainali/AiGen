@@ -155,7 +155,7 @@ covers, then two or three bullets under it starting with "- ". Use **bold**
 for the key terms. Keep the order the video uses.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
-    return generate(prompt)
+    return generate(prompt, config.SUMMARY_MODEL)
 
 
 def explain_topic(topic):
