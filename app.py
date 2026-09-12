@@ -241,8 +241,11 @@ def api_logout():
             store.wipe_session(session_id)
         session.clear()
         return json_ok({"message": "Session wiped"})
-    except Exception as error:
-        return json_error(str(error), 500)
+    except ValueError as error:
+        return json_error(str(error))
+    except Exception:
+        app.logger.exception("unhandled error")
+        return json_error("Something went wrong. Please try again.", 500)
 
 
 if __name__ == "__main__":
