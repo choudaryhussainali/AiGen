@@ -32,7 +32,6 @@ def sign_up(email, password):
         raise ValueError(_friendly_error(error))
     if result.user is None:
         raise ValueError("Could not create that account.")
-    return {"email": result.user.email}
 
 
 def sign_in(email, password):
