@@ -1,10 +1,10 @@
-"""All Gemini calls plus the retrieval step for notes questions."""
+"""All Groq calls, local embeddings and the retrieval step for notes questions."""
+
+import base64
 
 import numpy as np
 import requests
 from fastembed import TextEmbedding
-from google import genai
-from google.genai import types
 
 import config
 
@@ -19,24 +19,6 @@ def embed_documents(texts):
 
 def embed_query(text):
     return np.array(list(_embedder.query_embed([text]))[0], dtype="float32")
-
-
-_client = genai.Client(api_key=config.GEMINI_API_KEY)
-
-
-def _raise_friendly(error):
-    """Gemini quota and safety errors reach the user as readable sentences."""
-    text = str(error)
-    # A daily quota block lasts until midnight Pacific, a per minute one does not.
-    if "PerDay" in text:
-        raise ValueError("The daily Gemini free quota is used up. It resets at midnight Pacific Time.")
-    if "RESOURCE_EXHAUSTED" in text or "429" in text:
-        raise ValueError("The AI service is busy right now. Please wait a minute.")
-    if "UNAVAILABLE" in text or "503" in text:
-        raise ValueError("The AI service is under heavy load. Please try again.")
-    if "API key" in text or "PERMISSION_DENIED" in text:
-        raise ValueError("The Gemini API key was rejected. Check your .env file.")
-    raise error
 
 
 def _chat(messages, model):
@@ -73,17 +55,12 @@ def generate(prompt, model=None):
 
 
 def generate_from_image(image_bytes, mime_type, prompt):
-    part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
-    try:
-        response = _client.models.generate_content(
-            model=config.VISION_MODEL, contents=[part, prompt]
-        )
-    except Exception as error:
-        _raise_friendly(error)
-    text = (response.text or "").strip()
-    if not text:
-        raise ValueError("The model could not read that image. Please try another.")
-    return text
+    encoded = base64.b64encode(image_bytes).decode("ascii")
+    content = [
+        {"type": "text", "text": prompt},
+        {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}},
+    ]
+    return _chat([{"role": "user", "content": content}], config.VISION_MODEL)
 
 
 def _normalise(matrix):
