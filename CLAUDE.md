@@ -5,6 +5,9 @@ Full spec lives in AiGen_Master_Prompt.md. Read it if anything here is unclear.
 ## Hard rules
 - Vanilla HTML, CSS and JavaScript only. No React, no Tailwind, no build step, no npm.
 - No LangChain, no ChromaDB, no Celery, no Redis, no Docker, no ORM.
+- Text and vision go to Groq over the OpenAI compatible chat completions endpoint
+  using plain requests. Embeddings run locally through fastembed. No google-genai,
+  no LangChain, no sentence-transformers, no PyTorch.
 - Plain module-level functions. One class permitted in the entire project.
 - Synchronous Flask only. No async, no threads, no background workers.
 - Every function under 40 lines. Every file under 300 lines.
