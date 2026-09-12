@@ -1,6 +1,7 @@
 """All Gemini calls plus the retrieval step for notes questions."""
 
 import numpy as np
+import requests
 from fastembed import TextEmbedding
 from google import genai
 from google.genai import types
@@ -38,22 +39,44 @@ def _raise_friendly(error):
     raise error
 
 
-def generate(prompt):
+def _chat(messages, model):
+    """One POST to the OpenAI compatible endpoint Groq exposes."""
     try:
-        response = _client.models.generate_content(model=config.TEXT_MODEL, contents=prompt)
-    except Exception as error:
-        _raise_friendly(error)
-    text = (response.text or "").strip()
+        response = requests.post(
+            f"{config.GROQ_BASE_URL}/chat/completions",
+            headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
+            json={"model": model, "messages": messages, "temperature": 0.3},
+            timeout=config.REQUEST_TIMEOUT_SECONDS,
+        )
+    except requests.exceptions.RequestException:
+        raise ValueError("Could not reach the AI service. Check your internet connection.")
+    if response.status_code != 200:
+        raise ValueError(_status_message(response.status_code))
+    text = response.json()["choices"][0]["message"]["content"].strip()
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
     return text
+
+
+def _status_message(status):
+    if status == 429:
+        return "The AI service is busy right now. Please wait a minute and try again."
+    if status == 401:
+        return "The Groq API key was rejected. Check your .env file."
+    if status == 413:
+        return "That input is too long for the model. Try a shorter one."
+    return "The AI model returned an error. Please try again."
+
+
+def generate(prompt, model=None):
+    return _chat([{"role": "user", "content": prompt}], model or config.TEXT_MODEL)
 
 
 def generate_from_image(image_bytes, mime_type, prompt):
     part = types.Part.from_bytes(data=image_bytes, mime_type=mime_type)
     try:
         response = _client.models.generate_content(
-            model=config.TEXT_MODEL, contents=[part, prompt]
+            model=config.VISION_MODEL, contents=[part, prompt]
         )
     except Exception as error:
         _raise_friendly(error)
