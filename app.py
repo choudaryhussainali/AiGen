@@ -167,8 +167,9 @@ def api_exam():
         return json_ok({"plan": ai.build_exam_plan(outline)})
     except ValueError as error:
         return json_error(str(error))
-    except Exception as error:
-        return json_error(str(error), 500)
+    except Exception:
+        app.logger.exception("unhandled error")
+        return json_error("Something went wrong. Please try again.", 500)
 
 
 @app.post("/api/paper/solve")
