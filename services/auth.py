@@ -49,9 +49,10 @@ def sign_in(email, password):
     }
 
 
-def sign_out(access_token):
-    # A failed revoke must never block logout, the RAM session is wiped anyway.
+def sign_out():
+    # The anon key cannot revoke another user's token, so logout is local:
+    # the RAM session is wiped and the cookie is cleared by the route.
     try:
-        _client.auth.admin.sign_out(access_token)
+        _client.auth.sign_out()
     except Exception:
         pass

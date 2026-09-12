@@ -237,7 +237,7 @@ def api_logout():
     try:
         session_id, active = current_session()
         if active:
-            auth.sign_out(active["access_token"])
+            auth.sign_out()
             store.wipe_session(session_id)
         session.clear()
         return json_ok({"message": "Session wiped"})
