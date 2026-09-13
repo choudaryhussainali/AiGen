@@ -104,7 +104,7 @@ def generate_from_image(image_bytes, mime_type, prompt):
         {"type": "text", "text": prompt},
         {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}},
     ]
-    return _chat([{"role": "user", "content": content}], config.VISION_MODEL)
+    return _chat([{"role": "user", "content": content}], config.VISION_MODEL, config.PAPER_WAIT_SECONDS)
 
 
 def _normalise(matrix):

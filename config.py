@@ -18,6 +18,8 @@ SUMMARY_MODEL = "openai/gpt-oss-120b"
 VISION_MODEL = "qwen/qwen3.8-27b"
 # Groq refuses vision requests whose reply could pass its 1000 output tokens a minute cap.
 VISION_MAX_TOKENS = 900
+# A vision reply uses most of that budget, so a paper solve waits out a longer rate limit.
+PAPER_WAIT_SECONDS = 10
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 MAX_FILE_MB = 10
