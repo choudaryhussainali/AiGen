@@ -8,7 +8,7 @@ from fastembed import TextEmbedding
 
 import config
 
-# Constructed once at import. The first run downloads roughly 130 MB and caches it,
+# Constructed once at import. The first run downloads roughly 90 MB and caches it,
 # every run after that is offline and has no request limit at all.
 _embedder = TextEmbedding(model_name=config.EMBED_MODEL)
 
