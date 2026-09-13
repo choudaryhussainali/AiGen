@@ -94,23 +94,32 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate(prompt, config.SUMMARY_MODEL)
 
 
-def answer_from_notes(question, chunks, embeddings):
+def _chat_messages(system, history, question):
+    messages = [{"role": "system", "content": system}]
+    for turn in history:
+        # Earlier answers are trimmed so the chat stays inside the token budget.
+        earlier = turn["answer"][:config.HISTORY_ANSWER_CHARS]
+        messages.append({"role": "user", "content": turn["question"]})
+        messages.append({"role": "assistant", "content": earlier})
+    messages.append({"role": "user", "content": question})
+    return messages
+
+
+def answer_from_notes(question, chunks, embeddings, history):
     top = _top_chunks(question, chunks, embeddings)
     context = "\n\n".join(
         f"[page {chunk['page']}]\n{chunk['text']}" for chunk in top
     )
-    prompt = f"""Answer the student question using only the notes below.
+    prompt = f"""Answer the student questions using only the notes below.
 
 Notes:
 {context}
-
-Question: {question}
 
 Answer in two or three sentences of plain English. If the notes do not contain
 the answer, reply with exactly: I could not find this in your notes
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
-    answer = generate(prompt)
+    answer = _chat(_chat_messages(prompt, history, question), config.TEXT_MODEL)
     return answer, sorted({chunk["page"] for chunk in top})
 
 

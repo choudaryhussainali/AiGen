@@ -3,7 +3,7 @@
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from config import SESSION_TIMEOUT_MINUTES
+from config import HISTORY_TURNS, SESSION_TIMEOUT_MINUTES
 
 _sessions = {}
 
@@ -21,6 +21,7 @@ def create_session(email, access_token):
         "chunks": [],
         "embeddings": None,
         "filename": None,
+        "history": [],
         "created_at": now,
         "last_seen": now,
     }
@@ -58,3 +59,13 @@ def set_document(session_id, chunks, embeddings, filename):
     session["chunks"] = chunks
     session["embeddings"] = embeddings
     session["filename"] = filename
+    session["history"] = []
+
+
+def add_turn(session_id, question, answer):
+    session = _sessions.get(session_id)
+    if session is None:
+        return
+    session["history"].append({"question": question, "answer": answer})
+    # Only the newest turns stay in RAM, older ones are dropped for good.
+    del session["history"][:-HISTORY_TURNS]
