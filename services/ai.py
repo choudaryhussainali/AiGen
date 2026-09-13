@@ -57,28 +57,10 @@ def _chat(messages, model):
         response = _post(payload)
     if response.status_code != 200:
         raise ValueError(_status_message(response.status_code))
-    text = _plain_markdown(response.json()["choices"][0]["message"]["content"]).strip()
+    text = documents.plain_markdown(response.json()["choices"][0]["message"]["content"]).strip()
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
     return text
-
-
-def _plain_markdown(text):
-    """Rewrites tables and deep headings into the four forms the page renders."""
-    # The project uses plain hyphens only, but models still emit typographic dashes.
-    text = text.replace(chr(0x2014), "-").replace(chr(0x2013), "-").replace(chr(0x2011), "-")
-    lines = []
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped and re.fullmatch(r"[\s:|-]+", stripped):
-            continue
-        if stripped.startswith("|"):
-            cells = [cell.strip() for cell in stripped.strip("|").split("|")]
-            line = "- " + "; ".join(cell for cell in cells if cell)
-        elif stripped.startswith("#"):
-            line = "## " + stripped.lstrip("#").strip()
-        lines.append(line)
-    return "\n".join(lines)
 
 
 def _status_message(status):
@@ -195,13 +177,6 @@ def _chat_messages(system, history, question):
     return messages
 
 
-def _cited_pages(answer, shown):
-    """Pages the answer names, limited to the pages it was actually shown."""
-    groups = re.findall(r"pages?\s+([\d\s,&and]+)", answer, re.IGNORECASE)
-    named = {int(number) for group in groups for number in re.findall(r"\d+", group)}
-    return sorted(named & set(shown))
-
-
 def answer_from_notes(question, chunks, embeddings, summary, history):
     picked = _pick_chunks(question, history, chunks, embeddings)
     context = "\n\n".join(
@@ -227,7 +202,7 @@ only. Never use tables, "###" headings or numbered headings.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
     answer = _chat(_chat_messages(prompt, history, question), config.TEXT_MODEL)
-    return answer, _cited_pages(answer, [chunks[index]["page"] for index in picked])
+    return answer, documents.cited_pages(answer, [chunks[index]["page"] for index in picked])
 
 
 def build_exam_plan(outline):

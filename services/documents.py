@@ -1,4 +1,4 @@
-"""PDF text extraction, paragraph aware chunking and passage matching helpers."""
+"""PDF text extraction, chunking, passage matching and answer text helpers."""
 
 import re
 
@@ -114,3 +114,28 @@ def section_chunks(chunks, number):
         if found:
             current = found[-1]
     return picked
+
+
+def plain_markdown(text):
+    """Rewrites tables and deep headings into the four forms the page renders."""
+    # The project uses plain hyphens only, but models still emit typographic dashes.
+    text = text.replace(chr(0x2014), "-").replace(chr(0x2013), "-").replace(chr(0x2011), "-")
+    lines = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped and re.fullmatch(r"[\s:|-]+", stripped):
+            continue
+        if stripped.startswith("|"):
+            cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+            line = "- " + "; ".join(cell for cell in cells if cell)
+        elif stripped.startswith("#"):
+            line = "## " + stripped.lstrip("#").strip()
+        lines.append(line)
+    return "\n".join(lines)
+
+
+def cited_pages(answer, shown):
+    """Pages the answer names, limited to the pages it was actually shown."""
+    groups = re.findall(r"pages?\s+([\d\s,&and]+)", answer, re.IGNORECASE)
+    named = {int(number) for group in groups for number in re.findall(r"\d+", group)}
+    return sorted(named & set(shown))
