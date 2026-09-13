@@ -11,7 +11,7 @@ user uploads lives in server RAM only and is destroyed the moment they log out.
   answers that stream in, page citations, and memory of the last few questions.
 - **Exam Prep** turns a pasted course outline into a topic by topic study plan.
 - **Past Paper Solver** reads a question image and solves it with working shown.
-- **Video Summarizer** turns a YouTube link into a topic wise summary.
+- **Video Summarizer** turns a YouTube link into a summary in your chosen language.
 - **Topic Explainer** explains any topic with a definition, an analogy and three
   key points.
 
@@ -98,7 +98,7 @@ processing stage.
 
 ## Known limitations
 
-- English only, in both the prompts and the transcript lookup.
+- Prompts are in English. Video summaries can be written in six languages.
 - Notes chat keeps 4 exchanges, reads 7,000 characters, spots Chapter 3 style headings.
 - One worker only. Sessions live in one process's memory, so production needs a
   single Gunicorn worker (`gunicorn -w 1 app:app`); a second would not see them.
