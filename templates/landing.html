@@ -38,42 +38,6 @@
       <p class="note">Free for students. No card, no saved chat history.
         Already signed up? <a href="/login">Log in</a>.</p>
     </div>
-
-    <div class="panel">
-      <div class="panel-bar">
-        <span class="dot" id="statusDot"></span>
-        <span id="statusText">Session active</span>
-        <span class="clock" id="clock">00:00</span>
-      </div>
-      <div class="panel-body">
-        <ul class="items" id="items">
-          <li>
-            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span>
-            Thermodynamics, Lecture 4.pdf
-            <span class="meta">18 pages</span>
-          </li>
-          <li>
-            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-            Questions you asked about it
-            <span class="meta">4 exchanges</span>
-          </li>
-          <li>
-            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
-            Past paper photo, text read out
-            <span class="meta">1 image</span>
-          </li>
-          <li>
-            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg></span>
-            Search index built from your notes
-            <span class="meta">54 chunks</span>
-          </li>
-        </ul>
-        <div class="panel-foot">
-          <span class="count">Held in memory: <b id="count">4</b> items</span>
-          <button class="wipe" id="wipeBtn">Log out and wipe</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -195,6 +159,5 @@
   </div>
 </footer>
 
-<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
 </body>
 </html>
