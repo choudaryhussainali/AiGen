@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiGen: AI powered learning assistant</title>
+<meta name="description" content="Five study tools in one dashboard. Your notes, chats and uploads are held in memory only and wiped the moment you log out.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="lockup" href="#top" aria-label="AiGen home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#2B7DF3"/><stop offset="1" stop-color="#7A3FF2"/>
+          </linearGradient>
+        </defs>
+        <path d="M9 41 L22 14 C23 11.6 25 11.6 26 14 L39 41" fill="none"
+              stroke="url(#g)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M24 4 L40 10.5 L24 17 L8 10.5 Z" fill="#16203C"/>
+        <path d="M38 11 v6" stroke="#16203C" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="38" cy="19" r="2.2" fill="#16203C"/>
+        <path d="M24 27 l1.9 4.1 4.1 1.9 -4.1 1.9 -1.9 4.1 -1.9 -4.1 -4.1 -1.9 4.1 -1.9 Z" fill="#7A3FF2"/>
+      </svg>
+      <b>Ai<i>G</i><u>en</u></b>
+    </a>
+    <nav>
+      <a href="#tools">Tools</a>
+      <a href="#privacy">Your data</a>
+      <a href="#limits">Limits</a>
+      <a href="/login">Log in</a>
+    </nav>
+    <a class="btn btn-solid" href="/login#signup">Create an account</a>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>Study hard. Leave nothing behind.</h1>
+      <p class="lead">AiGen summarises your notes, reads your past papers and explains what you're
+        stuck on. It keeps all of it in memory while you work, then destroys it when you log out.</p>
+      <div class="actions">
+        <a class="btn btn-solid" href="/login#signup">Create an account</a>
+        <a class="btn btn-quiet" href="#privacy">See what gets deleted</a>
+      </div>
+      <p class="note">Free for students. No card, no saved chat history.
+        Already signed up? <a href="/login">Log in</a>.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-bar">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Session active</span>
+        <span class="clock" id="clock">00:00</span>
+      </div>
+      <div class="panel-body">
+        <ul class="items" id="items">
+          <li>
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span>
+            Thermodynamics, Lecture 4.pdf
+            <span class="meta">18 pages</span>
+          </li>
+          <li>
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            Questions you asked about it
+            <span class="meta">4 exchanges</span>
+          </li>
+          <li>
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
+            Past paper photo, text read out
+            <span class="meta">1 image</span>
+          </li>
+          <li>
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg></span>
+            Search index built from your notes
+            <span class="meta">54 chunks</span>
+          </li>
+        </ul>
+        <div class="panel-foot">
+          <span class="count">Held in memory: <b id="count">4</b> items</span>
+          <button class="wipe" id="wipeBtn">Log out and wipe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="tools" id="tools">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Five tools, one tab</h2>
+      <p>Most of them work on material you give them, so the answers follow your syllabus
+         rather than whatever the model happens to remember.</p>
+    </div>
+    <ul class="tool-list">
+      <li>
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-1.5z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></span>
+        <h3>Notes summariser</h3>
+        <p>Upload a lecture PDF and get the main points as bullets. Then ask it anything about
+           the file: it answers from your pages, cites the page numbers, and says when it adds
+           anything from outside them.</p>
+      </li>
+      <li>
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <h3>Exam preparation</h3>
+        <p>Paste your course outline. AiGen splits it into topics and gives each one a short
+           explanation, what to focus on and the usual mistakes, so you cover what the paper
+           actually asks for instead of guessing.</p>
+      </li>
+      <li>
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <h3>Past paper solver</h3>
+        <p>Photograph a printed past paper as a JPG or PNG up to 3&nbsp;MB. Each question is read
+           off the image and worked through step by step, followed by a short explanation of
+           why the method works.</p>
+      </li>
+      <li>
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></span>
+        <h3>Video summariser</h3>
+        <p>Paste a YouTube link and read the lecture in a few minutes. Its captions are turned
+           into a plain language explanation in the language you pick, so you can decide
+           whether the hour is worth it.</p>
+      </li>
+      <li>
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9.5 18h5M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg></span>
+        <h3>Topic explainer</h3>
+        <p>Type in the concept that won't click, like recursion, entropy or normalisation, and
+           get a plain definition, a real world analogy and three key points.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="life" id="privacy">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>What happens to a file you upload</h2>
+      <p>Your study material never reaches a hard drive. It lives in server memory for the length
+         of your session and is deleted from it when you log out. Text sent to the AI model for
+         an answer is processed by Groq under its own terms.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Uploaded</h3><p>PDFs up to 10&nbsp;MB, images up to 3&nbsp;MB.</p></div>
+      <div class="step"><h3>Checked</h3><p>File type and size confirmed before anything is read.</p></div>
+      <div class="step"><h3>Read</h3><p>Text pulled from the PDF, or off the image.</p></div>
+      <div class="step"><h3>Indexed</h3><p>Split into chunks the assistant can search.</p></div>
+      <div class="step"><h3>Answered</h3><p>Replies built from those chunks, with page numbers.</p></div>
+      <div class="step final"><h3>Wiped</h3><p>Deleted from memory at logout, or after an idle hour.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="limits" id="limits">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>What AiGen won't do</h2>
+      <p>Worth knowing before you sign up, so nothing comes as a surprise the night before a paper.</p>
+    </div>
+    <div class="limit-grid">
+      <div class="limit">
+        <h3>Remember your last session</h3>
+        <p>Log out and the summaries go with it. Copy anything you want to keep before you leave.</p>
+      </div>
+      <div class="limit">
+        <h3>Work offline</h3>
+        <p>The models run in the cloud, so a dropped connection stops the assistant mid-answer.</p>
+      </div>
+      <div class="limit">
+        <h3>Read messy handwriting</h3>
+        <p>Printed and cleanly scanned papers work best. Cursive notes often come back wrong.</p>
+      </div>
+      <div class="limit">
+        <h3>Work in every language</h3>
+        <p>Notes, exam prep and topic answers are built for English. Video summaries can be
+           written in six languages, including Urdu and Hindi.</p>
+      </div>
+      <div class="limit">
+        <h3>Open Word or PowerPoint files</h3>
+        <p>PDFs, JPG and PNG images, and YouTube links. Export your slides to PDF first.</p>
+      </div>
+      <div class="limit">
+        <h3>Sit your exam for you</h3>
+        <p>Answers come with the working shown, because the point is that you can repeat it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="signup">
+  <div class="wrap">
+    <h2>Bring one PDF and see how far you get</h2>
+    <p>Sign up with your email, upload your hardest set of notes, and log out when you're
+       done. Nothing stays behind.</p>
+    <a class="btn btn-solid" href="/login#signup">Create an account</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>AiGen: AI powered learning assistant</span>
+    <span class="credit">Final Year Design Project, Department of Information Technology<br>
+      Govt. M.A.O Graduate College Lahore</span>
+  </div>
+</footer>
+
+</body>
+</html>

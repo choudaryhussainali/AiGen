@@ -61,7 +61,7 @@ def signed_out_page(template):
 
 @app.get("/")
 def index():
-    return signed_out_page("auth.html")
+    return signed_out_page("landing.html")
 
 
 @app.get("/login")
