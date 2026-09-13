@@ -64,13 +64,13 @@ link in their inbox first.
 
 Logging in creates an entry in a plain Python dictionary in `services/store.py`,
 holding the user's email, their Supabase access token, and, once they upload a
-PDF, its text chunks and embeddings. Nothing study related is ever written to
-disk or to the database, uploads are read from the request stream straight into
-memory, and the browser cookie carries only the session id. Logging out deletes
-the whole entry, and any session untouched for 60 minutes is deleted on the next
-request. Python cannot guarantee that freed memory is overwritten, so this is not
-a secure erase, but the content never reaches persistent storage and every
-reference to it is dropped.
+PDF, its chunks, embeddings, summary and last few chat turns. Nothing study
+related is ever written to disk or to the database, uploads are read from the
+request stream straight into memory, and the browser cookie carries only the
+session id. Logging out deletes the whole entry, and any session untouched for 60
+minutes is deleted on the next request. Python cannot guarantee that freed memory
+is overwritten, so this is not a secure erase, but the content never reaches
+persistent storage and every reference to it is dropped.
 
 ## Privacy scope
 
