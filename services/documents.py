@@ -139,3 +139,23 @@ def cited_pages(answer, shown):
     groups = re.findall(r"pages?\s+([\d\s,&and]+)", answer, re.IGNORECASE)
     named = {int(number) for group in groups for number in re.findall(r"\d+", group)}
     return sorted(named & set(shown))
+
+
+_REFERRING = {"again", "it", "more", "that", "them", "these", "they", "this", "those"}
+
+
+def search_text(question, history):
+    """A vague follow up such as tell me more is searched with the question before it."""
+    found = keywords(question)
+    refers = _REFERRING & set(re.findall(r"[a-z]+", question.lower()))
+    if history and (not found or (refers and len(found) < 3)):
+        return history[-1]["question"] + " " + question
+    return question
+
+
+def keyword_shares(search, chunks):
+    """Share of the question's key words present in each chunk."""
+    wanted = keywords(search)
+    if not wanted:
+        return [0.0] * len(chunks)
+    return [len(wanted & keywords(chunk["text"])) / len(wanted) for chunk in chunks]

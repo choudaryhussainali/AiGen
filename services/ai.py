@@ -2,7 +2,6 @@
 
 import base64
 import json
-import re
 import time
 
 import numpy as np
@@ -109,32 +108,12 @@ def _normalise(matrix):
     return matrix / np.maximum(lengths, 1e-10)
 
 
-_REFERRING = {"again", "it", "more", "that", "them", "these", "they", "this", "those"}
-
-
-def _search_text(question, history):
-    """A vague follow up such as tell me more is searched with the question before it."""
-    found = documents.keywords(question)
-    refers = _REFERRING & set(re.findall(r"[a-z]+", question.lower()))
-    if history and (not found or (refers and len(found) < 3)):
-        return history[-1]["question"] + " " + question
-    return question
-
-
-def _keyword_scores(search, chunks):
-    """Share of the question's key words present in each chunk."""
-    wanted = documents.keywords(search)
-    if not wanted:
-        return np.zeros(len(chunks), dtype="float32")
-    shares = [len(wanted & documents.keywords(c["text"])) / len(wanted) for c in chunks]
-    return np.array(shares, dtype="float32")
-
-
 def _ranked_chunks(search, chunks, embeddings):
     """Indices best first, each strong match followed by its neighbours."""
     query = _normalise(np.atleast_2d(embed_query(search)))[0]
+    shares = np.array(documents.keyword_shares(search, chunks), dtype="float32")
     # Keywords catch exact terms such as acronyms that the embedding blurs.
-    scores = _normalise(embeddings) @ query + 0.3 * _keyword_scores(search, chunks)
+    scores = _normalise(embeddings) @ query + 0.3 * shares
     order = [int(index) for index in np.argsort(scores)[::-1]]
     picked = []
     for index in order[:config.TOP_K]:
@@ -160,7 +139,7 @@ def _pick_chunks(question, history, chunks, embeddings):
     """Whole small documents, a named chapter, or the best matching chunks."""
     if sum(len(chunk["text"]) for chunk in chunks) <= config.CONTEXT_CHARS:
         return list(range(len(chunks)))
-    search = _search_text(question, history)
+    search = documents.search_text(question, history)
     number = documents.section_number(question) or documents.section_number(search)
     section = documents.section_chunks(chunks, number) if number else []
     ranked = _ranked_chunks(search, chunks, embeddings)
