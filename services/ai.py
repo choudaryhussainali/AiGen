@@ -259,15 +259,19 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
 
 
 def summarize_video(transcript, language):
-    prompt = f"""Summarise this lecture video for a student who has not watched it.
+    prompt = f"""Below is a lecture video transcript, or study notes taken from each part in order.
 
 Transcript:
 {transcript}
 
-Write a topic wise summary. Use a "## " heading for each topic the video
-covers, then two or three bullets under it starting with "- ". Use **bold**
-for the key terms. Keep the order the video uses. Write the whole summary in
-{language}, even when the transcript is in another language.
+Explain the video in an easy to understand way for a student who has not watched
+it. Use simple words and short sentences, and explain each technical term the
+first time it appears. Start with "## Overview" and two or three sentences on what
+the video is about. Then give a "## " heading for each main topic in the order the
+video covers it, with "- " bullets that explain the idea simply and add an example
+or analogy where it helps. End with "## Key Takeaways" and three to five bullets.
+Use **bold** for key terms. Write the whole summary in {language}, even when the
+transcript is in another language.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate(prompt, config.SUMMARY_MODEL, config.VIDEO_WAIT_SECONDS)
