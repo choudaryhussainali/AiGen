@@ -115,15 +115,14 @@ function initAuthPage() {
     event.preventDefault();
     setAuthMode(state.authMode === "login" ? "signup" : "login");
   });
+  if (window.location.hash === "#signup") { setAuthMode("signup"); }
 }
 
 function showOutput(name, html) { document.getElementById(name + "-output").innerHTML = html; }
 function showCard(name, html) { showOutput(name, '<div class="output-card">' + html + "</div>"); }
 function setStatus(name, text) { document.getElementById(name + "-status").textContent = text; }
 
-function showOutputError(name, message) {
-  showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>");
-}
+function showOutputError(name, message) { showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>"); }
 
 async function runTool(job, action) {
   const button = document.getElementById(job.button || job.tool + "-button");
