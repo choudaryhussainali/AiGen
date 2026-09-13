@@ -23,8 +23,9 @@ they log out.
 | Web framework | Flask 3, synchronous |
 | Frontend | Jinja2, HTML5, CSS3, vanilla JavaScript, no build step |
 | Auth | Supabase Python client, email and password |
-| LLM | Google Gemini via google-genai, text and vision |
-| Vector search | Gemini embeddings, numpy cosine similarity over a RAM list |
+| LLM | Groq chat completions over plain requests, text and vision |
+| Embeddings | fastembed running locally, all-MiniLM-L6-v2 |
+| Vector search | numpy cosine similarity over a RAM list |
 | PDF text | pypdf |
 | Transcripts | youtube-transcript-api 1.2.4 or newer |
 | Sessions | Python dictionary in RAM |
