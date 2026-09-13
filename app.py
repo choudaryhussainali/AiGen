@@ -66,7 +66,9 @@ def dashboard():
     _, active = current_session()
     if active is None:
         return redirect("/")
-    return render_template("dashboard.html", email=active["email"])
+    return render_template(
+        "dashboard.html", email=active["email"], languages=config.SUMMARY_LANGUAGES
+    )
 
 
 @app.post("/api/signup")
