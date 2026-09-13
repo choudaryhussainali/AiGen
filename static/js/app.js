@@ -118,12 +118,15 @@ function initAuthPage() {
   });
 }
 
-function showOutput(name, html) { document.getElementById(name + "-output").innerHTML = html; }
+function showOutput(name, html, append) {
+  const node = document.getElementById(name + "-output");
+  node.innerHTML = append ? node.innerHTML + html : html;
+}
 function showCard(name, html) { showOutput(name, '<div class="output-card">' + html + "</div>"); }
 function setStatus(name, text) { document.getElementById(name + "-status").textContent = text; }
 
-function showOutputError(name, message) {
-  showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>");
+function showOutputError(name, message, append) {
+  showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>", append);
 }
 
 async function runTool(job, action) {
@@ -134,7 +137,7 @@ async function runTool(job, action) {
     await action();
   } catch (error) {
     toast(error.message, "error");
-    showOutputError(job.output || job.tool, error.message);
+    showOutputError(job.output || job.tool, error.message, job.append);
   }
   setStatus(job.tool, "");
   setLoading(button, false);
@@ -193,11 +196,12 @@ function askNotes() {
   const question = input.value.trim();
   if (!state.hasDocument) { return toast("Upload a PDF before asking questions.", "error"); }
   if (!question) { return toast("Please enter something first.", "error"); }
-  const job = { button: "notes-ask-button", tool: "notes", output: "notes-answer" };
-  job.status = "Searching your notes...";
+  const job = { button: "notes-ask-button", tool: "notes", output: "notes-answer", append: true };
+  job.status = "Reading your notes...";
   runTool(job, async function () {
     const data = await post("/api/notes/ask", { question: question });
-    showCard("notes-answer", renderMarkdown(data.answer) + citationHtml(data.pages));
+    const reply = renderMarkdown("**You asked:** " + question + "\n\n" + data.answer);
+    showOutput("notes-answer", '<div class="output-card">' + reply + citationHtml(data.pages) + "</div>", true);
     input.value = "";
   });
 }
