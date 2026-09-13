@@ -81,6 +81,12 @@ reference to it is dropped.
 > up to 12,000 characters of a PDF or transcript, and uploaded images. That half
 > is governed by Groq's API terms, which are outside AiGen's control.
 
+## Why embeddings run locally
+
+A hosted embedding model made PDF indexing depend on a provider request quota.
+The model now runs in the server process through fastembed, so indexing needs no
+key, no network after the first download, and has no request limit.
+
 ## Design deviation from proposal
 
 The original proposal named EasyOCR and Tesseract for reading past paper images.
