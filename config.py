@@ -10,6 +10,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 REQUEST_TIMEOUT_SECONDS = 120
+RATE_LIMIT_WAIT_SECONDS = 5
 
 # Long summaries go to the larger model, short answers stay on the fast one.
 TEXT_MODEL = "openai/gpt-oss-20b"

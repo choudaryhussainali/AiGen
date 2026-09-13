@@ -2,6 +2,7 @@
 
 import base64
 import re
+import time
 
 import numpy as np
 import requests
@@ -23,14 +24,10 @@ def embed_query(text):
     return np.array(list(_embedder.query_embed([text]))[0], dtype="float32")
 
 
-def _chat(messages, model):
+def _post(payload):
     """One POST to the OpenAI compatible endpoint Groq exposes."""
-    payload = {"model": model, "messages": messages, "temperature": 0.3}
-    if model.startswith("openai/gpt-oss"):
-        # Hidden reasoning tokens count against the per minute token budget.
-        payload["reasoning_effort"] = "low"
     try:
-        response = requests.post(
+        return requests.post(
             f"{config.GROQ_BASE_URL}/chat/completions",
             headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
             json=payload,
@@ -38,6 +35,21 @@ def _chat(messages, model):
         )
     except requests.exceptions.RequestException:
         raise ValueError("Could not reach the AI service. Check your internet connection.")
+
+
+def _chat(messages, model):
+    """A Groq chat completion, retried once when the rate limit clears quickly."""
+    payload = {"model": model, "messages": messages, "temperature": 0.3}
+    if model.startswith("openai/gpt-oss"):
+        # Hidden reasoning tokens count against the per minute token budget.
+        payload["reasoning_effort"] = "low"
+    response = _post(payload)
+    wait = response.headers.get("retry-after", "")
+    short = wait.isdigit() and int(wait) <= config.RATE_LIMIT_WAIT_SECONDS
+    if response.status_code == 429 and short:
+        # The token budget refills every second, so a short pause usually clears it.
+        time.sleep(int(wait) + 0.5)
+        response = _post(payload)
     if response.status_code != 200:
         raise ValueError(_status_message(response.status_code))
     text = response.json()["choices"][0]["message"]["content"].strip()
