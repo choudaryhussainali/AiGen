@@ -77,9 +77,9 @@ persistent storage and every reference to it is dropped.
 > Zero-Persistence applies to AiGen's own infrastructure: uploaded content lives
 > in server RAM only, is never written to disk or to the database, and is
 > destroyed on logout. Document chunks are embedded on the AiGen server and never
-> sent to a third party. Prompts for text generation do go to Groq: note excerpts,
-> up to 12,000 characters of a PDF or transcript, and uploaded images. That half
-> is governed by Groq's API terms, which are outside AiGen's control.
+> sent to a third party. Prompts for text generation go to Groq: chat turns, note
+> excerpts, summaries, up to 12,000 characters of a PDF or transcript, and images.
+> That half is governed by Groq's API terms, which are outside AiGen's control.
 
 ## Why embeddings run locally
 
