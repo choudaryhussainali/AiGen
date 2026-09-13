@@ -1,4 +1,4 @@
-const state = { activeTool: "notes", hasDocument: false, authMode: "login" };
+const state = { hasDocument: false, authMode: "login" };
 
 async function unwrap(response) {
   const payload = await response.json();
@@ -22,7 +22,6 @@ const TOOLS = {
 };
 
 function switchTool(name) {
-  state.activeTool = name;
   document.querySelectorAll(".nav-item").forEach(function (button) {
     button.classList.toggle("active", button.dataset.tool === name);
   });
