@@ -65,6 +65,8 @@ def _chat(messages, model):
 
 def _plain_markdown(text):
     """Rewrites tables and deep headings into the four forms the page renders."""
+    # The project uses plain hyphens only, but models still emit typographic dashes.
+    text = text.replace(chr(0x2014), "-").replace(chr(0x2013), "-").replace(chr(0x2011), "-")
     lines = []
     for line in text.splitlines():
         stripped = line.strip()
