@@ -8,7 +8,7 @@ user uploads lives in server RAM only and is destroyed the moment they log out.
 ## The five tools
 
 - **Notes Summarizer** uploads a PDF, summarises it, then chats about it with
-  page citations, remembering the last few questions.
+  answers that stream in, page citations, and memory of the last few questions.
 - **Exam Prep** turns a pasted course outline into a topic by topic study plan.
 - **Past Paper Solver** reads a question image and solves it with working shown.
 - **Video Summarizer** turns a YouTube link into a topic wise summary.
