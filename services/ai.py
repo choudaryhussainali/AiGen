@@ -32,14 +32,15 @@ def _post(payload):
             headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
             json=payload,
             timeout=config.REQUEST_TIMEOUT_SECONDS,
+            stream=payload["stream"],
         )
     except requests.exceptions.RequestException:
         raise ValueError("Could not reach the AI service. Check your internet connection.")
 
 
-def _chat(messages, model):
-    """A Groq chat completion that rides out rate limits where it can."""
-    payload = {"model": model, "messages": messages, "temperature": 0.3}
+def _open(messages, model, stream=False):
+    """Starts a Groq completion, riding out rate limits where it can."""
+    payload = {"model": model, "messages": messages, "temperature": 0.3, "stream": stream}
     if model.startswith("openai/gpt-oss"):
         # Hidden reasoning tokens count against the per minute token budget.
         payload["reasoning_effort"] = "low"
@@ -57,7 +58,13 @@ def _chat(messages, model):
         response = _post(payload)
     if response.status_code != 200:
         raise ValueError(_status_message(response.status_code))
-    text = documents.plain_markdown(response.json()["choices"][0]["message"]["content"]).strip()
+    return response
+
+
+def _chat(messages, model):
+    """A complete Groq reply, tidied into markdown the page can render."""
+    content = _open(messages, model).json()["choices"][0]["message"]["content"]
+    text = documents.plain_markdown(content).strip()
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
     return text
