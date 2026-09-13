@@ -32,7 +32,9 @@ img, svg { display: block; }
   padding: 32px;
 }
 
-.wordmark { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+/* The logo image is a 2000px square with its artwork between 320,700 and 1700,1170, so this frame crops to it. */
+.logo { width: 200px; aspect-ratio: 1380 / 470; overflow: hidden; }
+.logo img { max-width: none; width: 144.93%; margin: -50.72% 0 0 -23.19%; }
 .tagline { margin-top: 6px; color: var(--text-muted); font-size: 14px; }
 
 .input, .textarea {
@@ -271,7 +273,7 @@ img, svg { display: block; }
     overflow-x: auto;
   }
 
-  .sidebar .wordmark { font-size: 17px; }
+  .sidebar .logo { width: 120px; flex-shrink: 0; }
   .nav { grid-auto-flow: column; gap: 4px; }
   .nav-item { white-space: nowrap; }
   .panel { padding: 16px; }
