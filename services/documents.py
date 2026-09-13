@@ -22,14 +22,15 @@ def extract_pdf_pages(file_stream):
 def _split_long(paragraph):
     """A paragraph over the cap is broken at sentence ends, never mid word."""
     parts, buffer = [], ""
-    for sentence in re.split(r"(?<=[.!?])\s+", paragraph):
-        if buffer and len(buffer) + len(sentence) + 1 > CHUNK_SIZE:
-            parts.append(buffer)
-            buffer = sentence
-        else:
-            buffer = (buffer + " " + sentence).strip()
-    if buffer:
-        parts.append(buffer)
+    # Keeping the captured gaps preserves line breaks, so headings stay on their own line.
+    pieces = re.split(r"(?<=[.!?])(\s+)", paragraph)
+    for sentence, gap in zip(pieces[::2], pieces[1::2] + [""]):
+        if buffer.strip() and len(buffer) + len(sentence) > CHUNK_SIZE:
+            parts.append(buffer.strip())
+            buffer = ""
+        buffer += sentence + gap
+    if buffer.strip():
+        parts.append(buffer.strip())
     return parts
 
 
