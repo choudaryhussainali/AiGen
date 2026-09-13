@@ -223,12 +223,16 @@ def api_video():
         _, active = current_session()
         if active is None:
             return json_error("Not authenticated", 401)
-        url = (request.get_json(silent=True) or {}).get("url", "").strip()
+        payload = request.get_json(silent=True) or {}
+        url = (payload.get("url") or "").strip()
+        language = payload.get("language") or "English"
         if not url:
             return json_error("Please enter something first.")
+        if language not in config.SUMMARY_LANGUAGES:
+            return json_error("Please choose a summary language from the list.")
         video_id = youtube.extract_video_id(url)
         transcript = youtube.fetch_transcript(video_id)
-        summary = ai.summarize_video(transcript[:config.MAX_SUMMARY_CHARS])
+        summary = ai.summarize_video(transcript[:config.MAX_SUMMARY_CHARS], language)
         return json_ok({"summary": summary, "video_id": video_id})
     except ValueError as error:
         return json_error(str(error))

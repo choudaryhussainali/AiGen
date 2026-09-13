@@ -20,6 +20,7 @@ EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 MAX_FILE_MB = 10
 MAX_SUMMARY_CHARS = 12000
+SUMMARY_LANGUAGES = ["English", "Urdu", "Hindi", "Arabic", "Spanish", "French"]
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 TOP_K = 4

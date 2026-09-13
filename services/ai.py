@@ -259,7 +259,7 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate_from_image(image_bytes, mime_type, prompt)
 
 
-def summarize_video(transcript):
+def summarize_video(transcript, language):
     prompt = f"""Summarise this lecture video for a student who has not watched it.
 
 Transcript:
@@ -268,7 +268,7 @@ Transcript:
 Write a topic wise summary. Use a "## " heading for each topic the video
 covers, then two or three bullets under it starting with "- ". Use **bold**
 for the key terms. Keep the order the video uses. Write the whole summary in
-English, even when the transcript is in another language.
+{language}, even when the transcript is in another language.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate(prompt, config.SUMMARY_MODEL)
