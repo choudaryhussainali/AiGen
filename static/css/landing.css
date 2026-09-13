@@ -68,10 +68,11 @@ a{color:inherit}
 .hero{padding:5.5rem 0 5rem;background:
     radial-gradient(700px 340px at 82% 6%,rgba(122,63,242,.09),transparent 62%),
     radial-gradient(620px 300px at 10% 0%,rgba(43,125,243,.09),transparent 60%);}
+.hero .wrap{text-align:center}
 
-.hero h1{font-size:clamp(2.5rem,4.6vw,3.7rem);font-weight:700;max-width:12ch}
-.hero p.lead{font-size:1.12rem;color:var(--slate);max-width:46ch;margin:1.4rem 0 2.1rem}
-.hero .actions{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}
+.hero h1{font-size:clamp(2.5rem,4.6vw,3.7rem);font-weight:700;max-width:12ch;margin-inline:auto}
+.hero p.lead{font-size:1.12rem;color:var(--slate);max-width:46ch;margin:1.4rem auto 2.1rem}
+.hero .actions{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:center}
 .hero .note{margin-top:1.6rem;font-size:.9rem;color:var(--slate)}
 
 /* section frame */
