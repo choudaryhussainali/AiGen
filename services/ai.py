@@ -74,6 +74,18 @@ def _normalise(matrix):
     return matrix / np.maximum(lengths, 1e-10)
 
 
+_REFERRING = {"again", "it", "more", "that", "them", "these", "they", "this", "those"}
+
+
+def _search_text(question, history):
+    """A vague follow up such as tell me more is searched with the question before it."""
+    found = documents.keywords(question)
+    refers = _REFERRING & set(re.findall(r"[a-z]+", question.lower()))
+    if history and (not found or (refers and len(found) < 3)):
+        return history[-1]["question"] + " " + question
+    return question
+
+
 def _keyword_scores(search, chunks):
     """Share of the question's key words present in each chunk."""
     wanted = documents.keywords(search)
@@ -109,11 +121,12 @@ def _fit_budget(indices, chunks):
     return sorted(chosen)
 
 
-def _pick_chunks(question, chunks, embeddings):
+def _pick_chunks(question, history, chunks, embeddings):
     """A document that fits the budget is sent whole, otherwise the best matches."""
     if sum(len(chunk["text"]) for chunk in chunks) <= config.CONTEXT_CHARS:
         return list(range(len(chunks)))
-    return _fit_budget(_ranked_chunks(question, chunks, embeddings), chunks)
+    search = _search_text(question, history)
+    return _fit_budget(_ranked_chunks(search, chunks, embeddings), chunks)
 
 
 def summarize_notes(text):
@@ -149,7 +162,7 @@ def _cited_pages(answer, shown):
 
 
 def answer_from_notes(question, chunks, embeddings, summary, history):
-    picked = _pick_chunks(question, chunks, embeddings)
+    picked = _pick_chunks(question, history, chunks, embeddings)
     context = "\n\n".join(
         f"[page {chunks[index]['page']}]\n{chunks[index]['text']}" for index in picked
     )
