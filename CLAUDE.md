@@ -32,6 +32,8 @@ Full spec lives in AiGen_Master_Prompt.md. Read it if anything here is unclear.
 - Never commit .env, .claude/ or AiGen_Master_Prompt.md. Stage specific
   files, never use git add .
 - Never backdate commits or rewrite history.
+- Commit messages must never contain a Co-Authored-By trailer or any AI
+  attribution.
 
 ## Working style
 - Work through the phases in spec section 15.5 in order, continuously.
