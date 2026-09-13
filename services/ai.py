@@ -73,12 +73,36 @@ def _normalise(matrix):
     return matrix / np.maximum(lengths, 1e-10)
 
 
-def _top_chunks(question, chunks, embeddings):
-    """Cosine similarity is one dot product once both sides are normalised."""
-    query = _normalise(np.atleast_2d(embed_query(question)))[0]
+def _ranked_chunks(search, chunks, embeddings):
+    """Indices best first, each strong match followed by its neighbours."""
+    query = _normalise(np.atleast_2d(embed_query(search)))[0]
     scores = _normalise(embeddings) @ query
-    best = np.argsort(scores)[::-1][:config.TOP_K]
-    return [chunks[index] for index in best]
+    order = [int(index) for index in np.argsort(scores)[::-1]]
+    picked = []
+    for index in order[:config.TOP_K]:
+        for near in (index, index - 1, index + 1):
+            if 0 <= near < len(chunks) and near not in picked:
+                picked.append(near)
+    return picked + [index for index in order if index not in picked]
+
+
+def _fit_budget(indices, chunks):
+    """Takes indices in priority order until the context budget is spent."""
+    chosen, used = [], 0
+    for index in indices:
+        size = len(chunks[index]["text"])
+        if chosen and used + size > config.CONTEXT_CHARS:
+            break
+        chosen.append(index)
+        used += size
+    return sorted(chosen)
+
+
+def _pick_chunks(question, chunks, embeddings):
+    """A document that fits the budget is sent whole, otherwise the best matches."""
+    if sum(len(chunk["text"]) for chunk in chunks) <= config.CONTEXT_CHARS:
+        return list(range(len(chunks)))
+    return _fit_budget(_ranked_chunks(question, chunks, embeddings), chunks)
 
 
 def summarize_notes(text):
@@ -114,9 +138,9 @@ def _cited_pages(answer, shown):
 
 
 def answer_from_notes(question, chunks, embeddings, summary, history):
-    top = _top_chunks(question, chunks, embeddings)
+    picked = _pick_chunks(question, chunks, embeddings)
     context = "\n\n".join(
-        f"[page {chunk['page']}]\n{chunk['text']}" for chunk in top
+        f"[page {chunks[index]['page']}]\n{chunks[index]['text']}" for index in picked
     )
     prompt = f"""You are a study assistant chatting with a student about a PDF they uploaded.
 
@@ -136,7 +160,7 @@ Cite the pages you used in the form (page 3) and use **bold** for key terms.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
     answer = _chat(_chat_messages(prompt, history, question), config.TEXT_MODEL)
-    return answer, _cited_pages(answer, [chunk["page"] for chunk in top])
+    return answer, _cited_pages(answer, [chunks[index]["page"] for index in picked])
 
 
 def build_exam_plan(outline):
