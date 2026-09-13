@@ -38,12 +38,17 @@ def _post(payload):
 
 
 def _chat(messages, model):
-    """A Groq chat completion, retried once when the rate limit clears quickly."""
+    """A Groq chat completion that rides out rate limits where it can."""
     payload = {"model": model, "messages": messages, "temperature": 0.3}
     if model.startswith("openai/gpt-oss"):
         # Hidden reasoning tokens count against the per minute token budget.
         payload["reasoning_effort"] = "low"
     response = _post(payload)
+    other = {config.TEXT_MODEL: config.SUMMARY_MODEL, config.SUMMARY_MODEL: config.TEXT_MODEL}
+    if response.status_code == 429 and model in other:
+        # Each Groq model has its own token budget, so the other one is usually free.
+        payload["model"] = other[model]
+        response = _post(payload)
     wait = response.headers.get("retry-after", "")
     short = wait.isdigit() and int(wait) <= config.RATE_LIMIT_WAIT_SECONDS
     if response.status_code == 429 and short:
