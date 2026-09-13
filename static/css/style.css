@@ -76,6 +76,9 @@ img, svg { display: block; }
 .auth-heading { margin-top: 28px; font-size: 16px; font-weight: 600; }
 .auth-form { margin-top: var(--gap); display: grid; gap: 6px; }
 .auth-form .btn-primary { margin-top: 10px; }
+.name-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+.name-fields[hidden] { display: none; }
+.name-field { display: grid; gap: 6px; }
 .field-label { font-size: 13px; color: var(--text-muted); }
 
 .auth-error { margin-top: 12px; min-height: 18px; font-size: 13px; color: var(--danger); }

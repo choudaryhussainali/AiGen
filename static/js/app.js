@@ -84,23 +84,24 @@ function setAuthMode(mode) {
   document.getElementById("auth-switch-link").textContent = isLogin ? "Create account" : "Log in";
   document.getElementById("auth-error").textContent = "";
   document.getElementById("password").autocomplete = isLogin ? "current-password" : "new-password";
+  document.getElementById("name-fields").hidden = isLogin;
 }
 
 async function submitAuth(event) {
   event.preventDefault();
   const errorLine = document.getElementById("auth-error");
   const button = document.getElementById("auth-submit");
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  const body = { email: document.getElementById("email").value.trim(), password: document.getElementById("password").value };
+  const names = { first_name: document.getElementById("first-name").value.trim(), last_name: document.getElementById("last-name").value.trim() };
   errorLine.textContent = "";
   errorLine.classList.remove("is-success");
   button.disabled = true;
   try {
     if (state.authMode === "login") {
-      await post("/api/login", { email: email, password: password });
+      await post("/api/login", body);
       window.location = "/dashboard";
     } else {
-      await post("/api/signup", { email: email, password: password });
+      await post("/api/signup", Object.assign(body, names));
       setAuthMode("login");
       errorLine.classList.add("is-success");
       errorLine.textContent = "Account created. You can log in now.";

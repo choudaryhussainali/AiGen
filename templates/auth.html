@@ -10,6 +10,17 @@
 
     <h2 class="auth-heading" id="auth-heading">Log in</h2>
     <form class="auth-form" id="auth-form">
+      <div class="name-fields" id="name-fields" hidden>
+        <div class="name-field">
+          <label class="field-label" for="first-name">First name</label>
+          <input class="input" type="text" id="first-name" autocomplete="given-name" maxlength="50">
+        </div>
+        <div class="name-field">
+          <label class="field-label" for="last-name">Last name</label>
+          <input class="input" type="text" id="last-name" autocomplete="family-name" maxlength="50">
+        </div>
+      </div>
+
       <label class="field-label" for="email">Email</label>
       <input class="input" type="email" id="email" autocomplete="email" required>
 
