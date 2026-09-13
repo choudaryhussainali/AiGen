@@ -1,8 +1,9 @@
+import functools
 import io
 import json
 
-from flask import Flask, Response, jsonify, redirect, render_template, request, session
-from werkzeug.exceptions import RequestEntityTooLarge
+from flask import Flask, Response, g, jsonify, redirect, render_template, request, session
+from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 
 import config
 from services import ai, auth, documents, store, youtube
@@ -22,6 +23,20 @@ def json_ok(data):
 
 def json_error(message, status=400):
     return jsonify({"ok": False, "error": message}), status
+
+
+@app.errorhandler(Exception)
+def api_error(error):
+    """API failures become the JSON error shape, other pages keep Flask defaults."""
+    if request.url_rule is None or not request.path.startswith("/api/"):
+        if isinstance(error, HTTPException):
+            return error
+        raise error
+    # ValueError carries messages written for the user to read.
+    if isinstance(error, ValueError):
+        return json_error(str(error))
+    app.logger.error("unhandled error", exc_info=error)
+    return json_error("Something went wrong. Please try again.", 500)
 
 
 TOO_LARGE = f"File is too large. Maximum size is {config.MAX_FILE_MB} MB."
@@ -53,6 +68,17 @@ def current_session():
     return session_id, store.get_session(session_id)
 
 
+def login_required(view):
+    """API routes answer 401 without a live session, before their own body runs."""
+    @functools.wraps(view)
+    def guarded(*args, **kwargs):
+        g.session_id, g.active = current_session()
+        if g.active is None:
+            return json_error("Not authenticated", 401)
+        return view(*args, **kwargs)
+    return guarded
+
+
 def signed_out_page(template):
     """Visitor pages, anyone already logged in goes straight to the dashboard."""
     _, active = current_session()
@@ -81,71 +107,51 @@ def dashboard():
 
 @app.post("/api/signup")
 def api_signup():
-    try:
-        payload = request.get_json(silent=True) or {}
-        email = (payload.get("email") or "").strip()
-        password = payload.get("password") or ""
-        if not email or not password:
-            return json_error("Please enter something first.")
-        if len(password) < 6:
-            return json_error("Password must be at least 6 characters.")
-        first_name = (payload.get("first_name") or "").strip()[:50]
-        last_name = (payload.get("last_name") or "").strip()[:50]
-        if not first_name or not last_name:
-            return json_error("Please enter your first name and last name.")
-        auth.sign_up(email, password, first_name, last_name)
-        return json_ok({"message": "Account created"})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    payload = request.get_json(silent=True) or {}
+    email = (payload.get("email") or "").strip()
+    password = payload.get("password") or ""
+    if not email or not password:
+        return json_error("Please enter something first.")
+    if len(password) < 6:
+        return json_error("Password must be at least 6 characters.")
+    first_name = (payload.get("first_name") or "").strip()[:50]
+    last_name = (payload.get("last_name") or "").strip()[:50]
+    if not first_name or not last_name:
+        return json_error("Please enter your first name and last name.")
+    auth.sign_up(email, password, first_name, last_name)
+    return json_ok({"message": "Account created"})
 
 
 @app.post("/api/login")
 def api_login():
-    try:
-        payload = request.get_json(silent=True) or {}
-        email = (payload.get("email") or "").strip()
-        password = payload.get("password") or ""
-        if not email or not password:
-            return json_error("Please enter something first.")
-        account = auth.sign_in(email, password)
-        session["session_id"] = store.create_session(
-            account["email"], account["access_token"]
-        )
-        return json_ok({"email": account["email"]})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    payload = request.get_json(silent=True) or {}
+    email = (payload.get("email") or "").strip()
+    password = payload.get("password") or ""
+    if not email or not password:
+        return json_error("Please enter something first.")
+    account = auth.sign_in(email, password)
+    session["session_id"] = store.create_session(
+        account["email"], account["access_token"]
+    )
+    return json_ok({"email": account["email"]})
 
 
 @app.post("/api/notes/upload")
+@login_required
 def api_notes_upload():
-    try:
-        session_id, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
-        upload = get_upload()
-        if upload is None:
-            return json_error("Please choose a file first.")
-        data = read_upload(upload, (".pdf",), "Please upload a PDF file.")
-        pages = documents.extract_pdf_pages(io.BytesIO(data))
-        chunks = documents.chunk_pages(pages)
-        embeddings = ai.embed_documents([chunk["text"] for chunk in chunks])
-        full_text = "\n".join(page["text"] for page in pages)
-        summary = ai.summarize_notes(full_text[:config.MAX_SUMMARY_CHARS])
-        store.set_document(session_id, chunks, embeddings, upload.filename, summary)
-        return json_ok(
-            {"summary": summary, "filename": upload.filename, "pages": len(pages)}
-        )
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    upload = get_upload()
+    if upload is None:
+        return json_error("Please choose a file first.")
+    data = read_upload(upload, (".pdf",), "Please upload a PDF file.")
+    pages = documents.extract_pdf_pages(io.BytesIO(data))
+    chunks = documents.chunk_pages(pages)
+    embeddings = ai.embed_documents([chunk["text"] for chunk in chunks])
+    full_text = "\n".join(page["text"] for page in pages)
+    summary = ai.summarize_notes(full_text[:config.MAX_SUMMARY_CHARS])
+    store.set_document(g.session_id, chunks, embeddings, upload.filename, summary)
+    return json_ok(
+        {"summary": summary, "filename": upload.filename, "pages": len(pages)}
+    )
 
 
 def answer_events(session_id, question, pieces, shown):
@@ -168,126 +174,81 @@ def answer_events(session_id, question, pieces, shown):
 
 
 @app.post("/api/notes/ask")
+@login_required
 def api_notes_ask():
-    try:
-        session_id, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
-        question = (request.get_json(silent=True) or {}).get("question", "").strip()
-        if not question:
-            return json_error("Please enter something first.")
-        if not active["chunks"]:
-            return json_error("Upload a PDF before asking questions.")
-        pieces, shown = ai.stream_from_notes(
-            question, active["chunks"], active["embeddings"],
-            active["summary"], active["history"],
-        )
-        events = answer_events(session_id, question, pieces, shown)
-        return Response(events, mimetype="text/plain")
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    session_id, active = g.session_id, g.active
+    question = (request.get_json(silent=True) or {}).get("question", "").strip()
+    if not question:
+        return json_error("Please enter something first.")
+    if not active["chunks"]:
+        return json_error("Upload a PDF before asking questions.")
+    pieces, shown = ai.stream_from_notes(
+        question, active["chunks"], active["embeddings"],
+        active["summary"], active["history"],
+    )
+    events = answer_events(session_id, question, pieces, shown)
+    return Response(events, mimetype="text/plain")
 
 
 @app.post("/api/exam")
+@login_required
 def api_exam():
-    try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
-        outline = (request.get_json(silent=True) or {}).get("outline", "").strip()
-        if not outline:
-            return json_error("Please enter something first.")
-        return json_ok({"plan": ai.build_exam_plan(outline)})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    outline = (request.get_json(silent=True) or {}).get("outline", "").strip()
+    if not outline:
+        return json_error("Please enter something first.")
+    return json_ok({"plan": ai.build_exam_plan(outline)})
 
 
 @app.post("/api/paper/solve")
+@login_required
 def api_paper_solve():
-    try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
-        upload = get_upload()
-        if upload is None:
-            return json_error("Please choose a file first.")
-        message = "Please upload a JPG or PNG image."
-        data = read_upload(upload, (".jpg", ".jpeg", ".png"), message)
-        if len(data) > 3 * 1024 * 1024:
-            raise ValueError("That image is too large. Please upload one under 3 MB.")
-        is_png = upload.filename.lower().endswith(".png")
-        mime_type = "image/png" if is_png else "image/jpeg"
-        return json_ok({"solution": ai.solve_paper(data, mime_type)})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    upload = get_upload()
+    if upload is None:
+        return json_error("Please choose a file first.")
+    message = "Please upload a JPG or PNG image."
+    data = read_upload(upload, (".jpg", ".jpeg", ".png"), message)
+    if len(data) > 3 * 1024 * 1024:
+        raise ValueError("That image is too large. Please upload one under 3 MB.")
+    is_png = upload.filename.lower().endswith(".png")
+    mime_type = "image/png" if is_png else "image/jpeg"
+    return json_ok({"solution": ai.solve_paper(data, mime_type)})
 
 
 @app.post("/api/video")
+@login_required
 def api_video():
-    try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
-        payload = request.get_json(silent=True) or {}
-        url = (payload.get("url") or "").strip()
-        language = payload.get("language") or "English"
-        if not url:
-            return json_error("Please enter something first.")
-        if language not in config.SUMMARY_LANGUAGES:
-            return json_error("Please choose a summary language from the list.")
-        video_id = youtube.extract_video_id(url)
-        parts, complete = youtube.split_transcript(youtube.fetch_transcript(video_id))
-        summary = ai.summarize_video(ai.condense_transcript(parts), language)
-        if not complete:
-            summary += "\n\nThis video is very long, so only its first part was summarised."
-        return json_ok({"summary": summary, "video_id": video_id})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    payload = request.get_json(silent=True) or {}
+    url = (payload.get("url") or "").strip()
+    language = payload.get("language") or "English"
+    if not url:
+        return json_error("Please enter something first.")
+    if language not in config.SUMMARY_LANGUAGES:
+        return json_error("Please choose a summary language from the list.")
+    video_id = youtube.extract_video_id(url)
+    parts, complete = youtube.split_transcript(youtube.fetch_transcript(video_id))
+    summary = ai.summarize_video(ai.condense_transcript(parts), language)
+    if not complete:
+        summary += "\n\nThis video is very long, so only its first part was summarised."
+    return json_ok({"summary": summary, "video_id": video_id})
 
 
 @app.post("/api/topic")
+@login_required
 def api_topic():
-    try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
-        topic = (request.get_json(silent=True) or {}).get("topic", "").strip()
-        if not topic:
-            return json_error("Please enter something first.")
-        return json_ok({"explanation": ai.explain_topic(topic)})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    topic = (request.get_json(silent=True) or {}).get("topic", "").strip()
+    if not topic:
+        return json_error("Please enter something first.")
+    return json_ok({"explanation": ai.explain_topic(topic)})
 
 
 @app.post("/api/logout")
 def api_logout():
-    try:
-        session_id, active = current_session()
-        if active:
-            auth.sign_out()
-            store.wipe_session(session_id)
-        session.clear()
-        return json_ok({"message": "Session wiped"})
-    except ValueError as error:
-        return json_error(str(error))
-    except Exception:
-        app.logger.exception("unhandled error")
-        return json_error("Something went wrong. Please try again.", 500)
+    session_id, active = current_session()
+    if active:
+        auth.sign_out()
+        store.wipe_session(session_id)
+    session.clear()
+    return json_ok({"message": "Session wiped"})
 
 
 if __name__ == "__main__":

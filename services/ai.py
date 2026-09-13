@@ -44,6 +44,8 @@ def _open(messages, model, stream=False, patience=config.RATE_LIMIT_WAIT_SECONDS
     if model.startswith("openai/gpt-oss"):
         # Hidden reasoning tokens count against the per minute token budget.
         payload["reasoning_effort"] = "low"
+    if model == config.VISION_MODEL:
+        payload["max_tokens"] = config.VISION_MAX_TOKENS
     response = _post(payload)
     other = {config.TEXT_MODEL: config.SUMMARY_MODEL, config.SUMMARY_MODEL: config.TEXT_MODEL}
     if response.status_code == 429 and model in other:
@@ -57,7 +59,7 @@ def _open(messages, model, stream=False, patience=config.RATE_LIMIT_WAIT_SECONDS
         time.sleep(int(wait) + 0.5)
         response = _post(payload)
     if response.status_code != 200:
-        raise ValueError(_status_message(response.status_code))
+        raise ValueError(_status_message(response))
     return response
 
 
@@ -80,12 +82,14 @@ def _deltas(response):
                 yield piece
 
 
-def _status_message(status):
-    if status == 429:
+def _status_message(response):
+    if response.status_code == 429 and "Request too large" in response.text:
+        return "That request is bigger than the AI model accepts, so waiting will not help. Try a smaller input."
+    if response.status_code == 429:
         return "The AI service is busy right now. Please wait a minute and try again."
-    if status == 401:
+    if response.status_code == 401:
         return "The Groq API key was rejected. Check your .env file."
-    if status == 413:
+    if response.status_code == 413:
         return "That input is too long for the model. Try a shorter one."
     return "The AI model returned an error. Please try again."
 
@@ -100,7 +104,7 @@ def generate_from_image(image_bytes, mime_type, prompt):
         {"type": "text", "text": prompt},
         {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}},
     ]
-    return _chat([{"role": "user", "content": content}], config.VISION_MODEL)
+    return _chat([{"role": "user", "content": content}], config.VISION_MODEL, config.PAPER_WAIT_SECONDS)
 
 
 def _normalise(matrix):

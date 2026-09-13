@@ -11,12 +11,16 @@ Full spec lives in AiGen_Master_Prompt.md. Read it if anything here is unclear.
 - Plain module-level functions. One class permitted in the entire project.
 - Synchronous Flask only. No async, no threads, no background workers.
 - Every function under 40 lines. Every file under 300 lines.
-- Exactly 12 source files. The structure is fixed in spec section 5.
+- 16 source files: app.py, config.py, six in services/, four templates, two
+  stylesheets and two scripts. Tests live in tests/ and are not counted.
 - No dead code, no placeholders, no unused imports, no unused CSS.
 - No emojis anywhere.
 - No em dashes and no en dashes anywhere, including commit messages.
   Never emit the characters U+2014 or U+2013.
-- Do not add features beyond spec section 6.
+- Features: the auth flow and five tools from spec section 6, plus a landing
+  page, a streamed notes chat that remembers four exchanges, whole video
+  summaries in six languages, and first and last name on sign up. Add
+  nothing else unless asked.
 
 ## Commit rules
 - Conventional Commits: type(scope): subject
