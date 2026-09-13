@@ -16,6 +16,8 @@ RATE_LIMIT_WAIT_SECONDS = 5
 TEXT_MODEL = "openai/gpt-oss-20b"
 SUMMARY_MODEL = "openai/gpt-oss-120b"
 VISION_MODEL = "qwen/qwen3.8-27b"
+# Groq refuses vision requests whose reply could pass its 1000 output tokens a minute cap.
+VISION_MAX_TOKENS = 900
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 MAX_FILE_MB = 10
