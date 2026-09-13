@@ -1,4 +1,4 @@
-"""PDF text extraction and paragraph aware chunking."""
+"""PDF text extraction, paragraph aware chunking and passage matching helpers."""
 
 import re
 
@@ -68,3 +68,17 @@ def chunk_pages(pages):
     for page in pages:
         chunks.extend(_pack(_split_units(page["text"]), page["page"]))
     return chunks
+
+
+_STOPWORDS = {
+    "about", "and", "are", "can", "chap", "chapter", "chp", "detail", "details",
+    "does", "explain", "for", "from", "how", "lecture", "lesson", "module", "more",
+    "notes", "part", "please", "section", "tell", "that", "the", "this", "unit",
+    "week", "what", "when", "where", "which", "why", "with", "you",
+}
+
+
+def keywords(text):
+    """Distinct content words, the part of a question worth matching exactly."""
+    words = re.findall(r"[a-z0-9]+", text.lower())
+    return {word for word in words if len(word) > 2 and word not in _STOPWORDS}

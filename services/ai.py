@@ -8,6 +8,7 @@ import requests
 from fastembed import TextEmbedding
 
 import config
+from services import documents
 
 # Constructed once at import. The first run downloads roughly 90 MB and caches it,
 # every run after that is offline and has no request limit at all.
@@ -73,10 +74,20 @@ def _normalise(matrix):
     return matrix / np.maximum(lengths, 1e-10)
 
 
+def _keyword_scores(search, chunks):
+    """Share of the question's key words present in each chunk."""
+    wanted = documents.keywords(search)
+    if not wanted:
+        return np.zeros(len(chunks), dtype="float32")
+    shares = [len(wanted & documents.keywords(c["text"])) / len(wanted) for c in chunks]
+    return np.array(shares, dtype="float32")
+
+
 def _ranked_chunks(search, chunks, embeddings):
     """Indices best first, each strong match followed by its neighbours."""
     query = _normalise(np.atleast_2d(embed_query(search)))[0]
-    scores = _normalise(embeddings) @ query
+    # Keywords catch exact terms such as acronyms that the embedding blurs.
+    scores = _normalise(embeddings) @ query + 0.3 * _keyword_scores(search, chunks)
     order = [int(index) for index in np.argsort(scores)[::-1]]
     picked = []
     for index in order[:config.TOP_K]:
