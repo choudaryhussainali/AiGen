@@ -120,9 +120,9 @@ def api_notes_upload():
         pages = documents.extract_pdf_pages(io.BytesIO(data))
         chunks = documents.chunk_pages(pages)
         embeddings = ai.embed_documents([chunk["text"] for chunk in chunks])
-        store.set_document(session_id, chunks, embeddings, upload.filename)
         full_text = "\n".join(page["text"] for page in pages)
         summary = ai.summarize_notes(full_text[:config.MAX_SUMMARY_CHARS])
+        store.set_document(session_id, chunks, embeddings, upload.filename, summary)
         return json_ok(
             {"summary": summary, "filename": upload.filename, "pages": len(pages)}
         )
@@ -145,7 +145,8 @@ def api_notes_ask():
         if not active["chunks"]:
             return json_error("Upload a PDF before asking questions.")
         answer, pages = ai.answer_from_notes(
-            question, active["chunks"], active["embeddings"], active["history"]
+            question, active["chunks"], active["embeddings"],
+            active["summary"], active["history"],
         )
         store.add_turn(session_id, question, answer)
         return json_ok({"answer": answer, "pages": pages})

@@ -21,6 +21,7 @@ def create_session(email, access_token):
         "chunks": [],
         "embeddings": None,
         "filename": None,
+        "summary": None,
         "history": [],
         "created_at": now,
         "last_seen": now,
@@ -52,13 +53,14 @@ def get_session(session_id):
     return session
 
 
-def set_document(session_id, chunks, embeddings, filename):
+def set_document(session_id, chunks, embeddings, filename, summary):
     session = _sessions.get(session_id)
     if session is None:
         return
     session["chunks"] = chunks
     session["embeddings"] = embeddings
     session["filename"] = filename
+    session["summary"] = summary
     session["history"] = []
 
 

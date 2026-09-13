@@ -105,12 +105,15 @@ def _chat_messages(system, history, question):
     return messages
 
 
-def answer_from_notes(question, chunks, embeddings, history):
+def answer_from_notes(question, chunks, embeddings, summary, history):
     top = _top_chunks(question, chunks, embeddings)
     context = "\n\n".join(
         f"[page {chunk['page']}]\n{chunk['text']}" for chunk in top
     )
     prompt = f"""Answer the student questions using only the notes below.
+
+Summary of the whole document:
+{summary}
 
 Notes:
 {context}
