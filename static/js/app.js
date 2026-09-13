@@ -256,20 +256,15 @@ async function logout() {
 function onClick(id, handler) { document.getElementById(id).addEventListener("click", handler); }
 
 function onEnter(id, handler) {
-  document.getElementById(id).addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      handler();
-    }
-  });
+  const pressed = function (event) { if (event.key === "Enter") { handler(); } };
+  document.getElementById(id).addEventListener("keydown", pressed);
 }
 
 function initDashboard() {
   document.querySelectorAll(".nav-item").forEach(function (button) {
     button.addEventListener("click", function () { switchTool(button.dataset.tool); });
   });
-  bindDropzone("notes", function (file) {
-    showChosenFile("notes", file);
-  });
+  bindDropzone("notes", function (file) { showChosenFile("notes", file); });
   bindDropzone("paper", function (file) {
     showChosenFile("paper", file);
     showImagePreview(file);
@@ -287,10 +282,6 @@ function initDashboard() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  if (document.getElementById("auth-form")) {
-    initAuthPage();
-  }
-  if (document.querySelector(".dashboard")) {
-    initDashboard();
-  }
+  if (document.getElementById("auth-form")) { initAuthPage(); }
+  if (document.querySelector(".dashboard")) { initDashboard(); }
 });
