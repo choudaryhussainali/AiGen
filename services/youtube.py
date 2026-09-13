@@ -1,4 +1,4 @@
-"""YouTube video id parsing and transcript fetching."""
+"""YouTube video id parsing, transcript fetching and splitting."""
 
 import re
 
@@ -12,6 +12,8 @@ from youtube_transcript_api import (
     VideoUnplayable,
     YouTubeTranscriptApi,
 )
+
+from config import VIDEO_MAX_PARTS, VIDEO_PART_CHARS
 
 _ID_PATTERNS = [
     r"[?&]v=([0-9A-Za-z_-]{11})",
@@ -63,3 +65,14 @@ def fetch_transcript(video_id):
     if not text.strip():
         raise ValueError(_NO_SUBTITLES)
     return text
+
+
+def split_transcript(text):
+    """Cuts a transcript into parts one model request can hold, never mid word."""
+    parts = []
+    while text and len(parts) < VIDEO_MAX_PARTS:
+        cut = len(text) if len(text) <= VIDEO_PART_CHARS else text.rfind(" ", 0, VIDEO_PART_CHARS)
+        cut = cut if cut > 0 else VIDEO_PART_CHARS
+        parts.append(text[:cut].strip())
+        text = text[cut:].strip()
+    return parts, not text

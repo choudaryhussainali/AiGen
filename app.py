@@ -233,8 +233,10 @@ def api_video():
         if language not in config.SUMMARY_LANGUAGES:
             return json_error("Please choose a summary language from the list.")
         video_id = youtube.extract_video_id(url)
-        transcript = youtube.fetch_transcript(video_id)
-        summary = ai.summarize_video(transcript[:config.MAX_SUMMARY_CHARS], language)
+        parts, complete = youtube.split_transcript(youtube.fetch_transcript(video_id))
+        summary = ai.summarize_video(ai.condense_transcript(parts), language)
+        if not complete:
+            summary += "\n\nThis video is very long, so only its first part was summarised."
         return json_ok({"summary": summary, "video_id": video_id})
     except ValueError as error:
         return json_error(str(error))

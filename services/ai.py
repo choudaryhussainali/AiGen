@@ -38,7 +38,7 @@ def _post(payload):
         raise ValueError("Could not reach the AI service. Check your internet connection.")
 
 
-def _open(messages, model, stream=False):
+def _open(messages, model, stream=False, patience=config.RATE_LIMIT_WAIT_SECONDS):
     """Starts a Groq completion, riding out rate limits where it can."""
     payload = {"model": model, "messages": messages, "temperature": 0.3, "stream": stream}
     if model.startswith("openai/gpt-oss"):
@@ -51,7 +51,7 @@ def _open(messages, model, stream=False):
         payload["model"] = other[model]
         response = _post(payload)
     wait = response.headers.get("retry-after", "")
-    short = wait.isdigit() and int(wait) <= config.RATE_LIMIT_WAIT_SECONDS
+    short = wait.isdigit() and int(wait) <= patience
     if response.status_code == 429 and short:
         # The token budget refills every second, so a short pause usually clears it.
         time.sleep(int(wait) + 0.5)
@@ -61,9 +61,9 @@ def _open(messages, model, stream=False):
     return response
 
 
-def _chat(messages, model):
+def _chat(messages, model, patience=config.RATE_LIMIT_WAIT_SECONDS):
     """A complete Groq reply, tidied into markdown the page can render."""
-    content = _open(messages, model).json()["choices"][0]["message"]["content"]
+    content = _open(messages, model, patience=patience).json()["choices"][0]["message"]["content"]
     text = documents.plain_markdown(content).strip()
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
@@ -90,8 +90,8 @@ def _status_message(status):
     return "The AI model returned an error. Please try again."
 
 
-def generate(prompt, model=None):
-    return _chat([{"role": "user", "content": prompt}], model or config.TEXT_MODEL)
+def generate(prompt, model=None, patience=config.RATE_LIMIT_WAIT_SECONDS):
+    return _chat([{"role": "user", "content": prompt}], model or config.TEXT_MODEL, patience)
 
 
 def generate_from_image(image_bytes, mime_type, prompt):
@@ -238,6 +238,26 @@ Do not use emojis. Do not use dash characters other than the plain hyphen."""
     return generate_from_image(image_bytes, mime_type, prompt)
 
 
+def condense_transcript(parts):
+    """A short video goes in whole, a long one is condensed part by part first."""
+    if len(parts) == 1:
+        return parts[0]
+    notes = []
+    for number, part in enumerate(parts, start=1):
+        prompt = f"""This is part {number} of {len(parts)} of a lecture video transcript.
+
+Transcript part:
+{part}
+
+Write at most eight short "- " bullets of study notes for this part: the topics in
+order, key ideas, definitions, examples and any steps the speaker explains. Use
+**bold** for key terms and write in English.
+
+Do not use emojis. Do not use dash characters other than the plain hyphen."""
+        notes.append(generate(prompt, config.SUMMARY_MODEL, config.VIDEO_WAIT_SECONDS))
+    return "\n\n".join(notes)[:config.MAX_SUMMARY_CHARS]
+
+
 def summarize_video(transcript, language):
     prompt = f"""Summarise this lecture video for a student who has not watched it.
 
@@ -250,7 +270,7 @@ for the key terms. Keep the order the video uses. Write the whole summary in
 {language}, even when the transcript is in another language.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
-    return generate(prompt, config.SUMMARY_MODEL)
+    return generate(prompt, config.SUMMARY_MODEL, config.VIDEO_WAIT_SECONDS)
 
 
 def explain_topic(topic):
