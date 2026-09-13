@@ -42,8 +42,8 @@ cp .env.example .env         # on Windows: copy .env.example .env
 python app.py
 ```
 
-Fill the four values in `.env` before starting the server, then open
-http://127.0.0.1:5000 in a browser.
+Fill the four values in `.env`, start the server, and open http://127.0.0.1:5000.
+The first start downloads the embedding model, about 90 MB, and caches it.
 
 ## Where the keys come from
 
