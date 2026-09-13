@@ -99,7 +99,7 @@ processing stage.
 ## Known limitations
 
 - English only, in both the prompts and the transcript lookup.
-- No chat history, follow up answers are not remembered between questions.
+- Notes chat keeps 4 exchanges, reads 9,000 characters, spots Chapter 3 style headings.
 - One worker only. Sessions live in one process's memory, so production needs a
   single Gunicorn worker (`gunicorn -w 1 app:app`); a second would not see them.
 - PDFs are capped at 10 MB, past paper images at 3 MB for Groq's image limit.
