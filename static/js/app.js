@@ -6,13 +6,12 @@ async function unwrap(response) {
   return payload.data;
 }
 
-async function post(url, body) {
-  return unwrap(await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body || {})
-  }));
+function send(url, body) {
+  const json = { "Content-Type": "application/json" };
+  return fetch(url, { method: "POST", headers: json, body: JSON.stringify(body || {}) });
 }
+
+async function post(url, body) { return unwrap(await send(url, body)); }
 
 const TOOLS = {
   notes: ["Notes Summarizer", "Upload a PDF, get a summary, then ask questions about it."],
@@ -118,26 +117,21 @@ function initAuthPage() {
   });
 }
 
-function showOutput(name, html, append) {
-  const node = document.getElementById(name + "-output");
-  node.innerHTML = append ? node.innerHTML + html : html;
-}
+function showOutput(name, html) { document.getElementById(name + "-output").innerHTML = html; }
 function showCard(name, html) { showOutput(name, '<div class="output-card">' + html + "</div>"); }
 function setStatus(name, text) { document.getElementById(name + "-status").textContent = text; }
 
-function showOutputError(name, message, append) {
-  showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>", append);
+function showOutputError(name, message) {
+  showOutput(name, '<p class="output-error">' + escapeHtml(message) + "</p>");
 }
 
 async function runTool(job, action) {
   const button = document.getElementById(job.button || job.tool + "-button");
   setLoading(button, true);
   setStatus(job.tool, job.status);
-  try {
-    await action();
-  } catch (error) {
+  try { await action(); } catch (error) {
     toast(error.message, "error");
-    showOutputError(job.output || job.tool, error.message, job.append);
+    showOutputError(job.tool, error.message);
   }
   setStatus(job.tool, "");
   setLoading(button, false);
@@ -191,18 +185,36 @@ function citationHtml(pages) {
   return '<div class="citations"><span class="citation-label">Source:</span>' + badges.join("") + "</div>";
 }
 
+async function streamAnswer(question, card) {
+  const response = await send("/api/notes/ask", { question: question });
+  if (!response.ok) { return unwrap(response); }
+  const reader = response.body.getReader(), decoder = new TextDecoder();
+  const asked = "**You asked:** " + question + "\n\n";
+  let body = "";
+  for (let part = await reader.read(); !part.done; part = await reader.read()) {
+    body += decoder.decode(part.value, { stream: true });
+    card.innerHTML = renderMarkdown(asked + body.split("\u0000")[0]);
+  }
+  // The server ends the text with a NUL byte and a JSON trailer holding the tidy answer.
+  const end = JSON.parse(body.split("\u0000")[1] || JSON.stringify({ error: "The answer was cut off. Please ask again." }));
+  if (end.error) { throw new Error(end.error); }
+  card.innerHTML = renderMarkdown(asked + end.answer) + citationHtml(end.pages);
+}
+
 function askNotes() {
   const input = document.getElementById("notes-question");
   const question = input.value.trim();
   if (!state.hasDocument) { return toast("Upload a PDF before asking questions.", "error"); }
   if (!question) { return toast("Please enter something first.", "error"); }
-  const job = { button: "notes-ask-button", tool: "notes", output: "notes-answer", append: true };
-  job.status = "Reading your notes...";
-  runTool(job, async function () {
-    const data = await post("/api/notes/ask", { question: question });
-    const reply = renderMarkdown("**You asked:** " + question + "\n\n" + data.answer);
-    showOutput("notes-answer", '<div class="output-card">' + reply + citationHtml(data.pages) + "</div>", true);
-    input.value = "";
+  const thread = document.getElementById("notes-answer-output");
+  thread.insertAdjacentHTML("beforeend", '<div class="output-card">' + renderMarkdown("**You asked:** " + question) + "</div>");
+  const card = thread.lastElementChild;
+  input.value = "";
+  runTool({ button: "notes-ask-button", tool: "notes", status: "Reading your notes..." }, function () {
+    return streamAnswer(question, card).catch(function (error) {
+      toast(error.message, "error");
+      card.insertAdjacentHTML("beforeend", '<p class="output-error">' + escapeHtml(error.message) + "</p>");
+    });
   });
 }
 

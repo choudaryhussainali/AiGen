@@ -1,6 +1,7 @@
 import io
+import json
 
-from flask import Flask, jsonify, redirect, render_template, request, session
+from flask import Flask, Response, jsonify, redirect, render_template, request, session
 from werkzeug.exceptions import RequestEntityTooLarge
 
 import config
@@ -133,6 +134,25 @@ def api_notes_upload():
         return json_error("Something went wrong. Please try again.", 500)
 
 
+def answer_events(session_id, question, pieces, shown):
+    """Streams the answer text, then a NUL byte and a JSON trailer with the tidy answer."""
+    answer = ""
+    try:
+        for piece in pieces:
+            answer += piece
+            yield piece
+    except Exception:
+        app.logger.exception("answer stream interrupted")
+        yield "\0" + json.dumps({"error": "The answer was cut off. Please ask again."})
+        return
+    final = documents.plain_markdown(answer).strip()
+    if not final:
+        yield "\0" + json.dumps({"error": "The model returned an empty response. Please try again."})
+        return
+    store.add_turn(session_id, question, final)
+    yield "\0" + json.dumps({"answer": final, "pages": documents.cited_pages(final, shown)})
+
+
 @app.post("/api/notes/ask")
 def api_notes_ask():
     try:
@@ -144,12 +164,12 @@ def api_notes_ask():
             return json_error("Please enter something first.")
         if not active["chunks"]:
             return json_error("Upload a PDF before asking questions.")
-        answer, pages = ai.answer_from_notes(
+        pieces, shown = ai.stream_from_notes(
             question, active["chunks"], active["embeddings"],
             active["summary"], active["history"],
         )
-        store.add_turn(session_id, question, answer)
-        return json_ok({"answer": answer, "pages": pages})
+        events = answer_events(session_id, question, pieces, shown)
+        return Response(events, mimetype="text/plain")
     except ValueError as error:
         return json_error(str(error))
     except Exception:

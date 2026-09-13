@@ -1,6 +1,7 @@
 """All Groq calls, local embeddings and the retrieval step for notes questions."""
 
 import base64
+import json
 import re
 import time
 
@@ -68,6 +69,16 @@ def _chat(messages, model):
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
     return text
+
+
+def _deltas(response):
+    """Yields reply text as Groq streams it, one server sent event per line."""
+    for raw in response.iter_lines():
+        line = raw.decode("utf-8")
+        if line.startswith("data: ") and line != "data: [DONE]":
+            piece = json.loads(line[6:])["choices"][0]["delta"].get("content")
+            if piece:
+                yield piece
 
 
 def _status_message(status):
@@ -184,7 +195,7 @@ def _chat_messages(system, history, question):
     return messages
 
 
-def answer_from_notes(question, chunks, embeddings, summary, history):
+def stream_from_notes(question, chunks, embeddings, summary, history):
     picked = _pick_chunks(question, history, chunks, embeddings)
     context = "\n\n".join(
         f"[page {chunks[index]['page']}]\n{chunks[index]['text']}" for index in picked
@@ -208,8 +219,10 @@ Format with "## " headings, "- " bullets, **bold** key terms and plain paragraph
 only. Never use tables, "###" headings or numbered headings.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
-    answer = _chat(_chat_messages(prompt, history, question), config.TEXT_MODEL)
-    return answer, documents.cited_pages(answer, [chunks[index]["page"] for index in picked])
+    messages = _chat_messages(prompt, history, question)
+    # Opening the stream here surfaces rate limit and key errors before any text is sent.
+    response = _open(messages, config.TEXT_MODEL, stream=True)
+    return _deltas(response), [chunks[index]["page"] for index in picked]
 
 
 def build_exam_plan(outline):
