@@ -110,16 +110,21 @@ def answer_from_notes(question, chunks, embeddings, summary, history):
     context = "\n\n".join(
         f"[page {chunk['page']}]\n{chunk['text']}" for chunk in top
     )
-    prompt = f"""Answer the student questions using only the notes below.
+    prompt = f"""You are a study assistant chatting with a student about a PDF they uploaded.
 
 Summary of the whole document:
 {summary}
 
-Notes:
+Excerpts from the document, each marked with its page:
 {context}
 
-Answer in two or three sentences of plain English. If the notes do not contain
-the answer, reply with exactly: I could not find this in your notes
+Answer the student fully. When they ask for more detail, an explanation of a
+chapter or section, or examples, give a thorough answer built from the excerpts,
+with "## " headings and "- " bullets where they help. You may add general
+knowledge to explain an idea the document mentions, but say when you go beyond
+the document. Only when neither the excerpts nor the summary relate to the
+question, say the document does not cover it and name what it does cover.
+Cite the pages you used in the form (page 3) and use **bold** for key terms.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
     answer = _chat(_chat_messages(prompt, history, question), config.TEXT_MODEL)
