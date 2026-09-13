@@ -50,11 +50,9 @@ a{color:inherit}
 }
 .masthead .wrap{display:flex;align-items:center;gap:2rem;height:74px}
 
-.lockup{display:flex;align-items:center;gap:.65rem;text-decoration:none}
-.lockup svg{width:38px;height:38px;flex:none}
-.lockup b{font-family:var(--display);font-weight:700;font-size:1.35rem;letter-spacing:-.03em}
-.lockup b i{font-style:normal;color:var(--blue)}
-.lockup b u{text-decoration:none;color:var(--violet)}
+/* The logo image is a 2000px square with its artwork between 320,700 and 1700,1170, so the link crops to it. */
+.lockup{display:block;flex:none;width:170px;aspect-ratio:1380/470;overflow:hidden}
+.lockup img{display:block;max-width:none;width:144.93%;margin:-50.72% 0 0 -23.19%}
 
 .masthead nav{margin-left:auto;display:flex;align-items:center;gap:1.9rem}
 .masthead nav a{
@@ -189,6 +187,7 @@ footer .credit{margin-left:auto;text-align:right}
 }
 @media (max-width:640px){
   body{font-size:16px}
+  .lockup{width:118px}
   section{padding:4rem 0}
   .hero{padding:3.5rem 0}
   .tool-list li{grid-template-columns:32px 1fr;gap:.9rem .9rem}
