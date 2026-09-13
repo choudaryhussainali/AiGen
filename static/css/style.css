@@ -250,6 +250,8 @@ img, svg { display: block; }
   object-fit: contain;
 }
 
+.image-preview[hidden] { display: none; }
+
 @media (max-width: 900px) {
   .dashboard { grid-template-columns: 1fr; }
 
