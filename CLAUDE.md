@@ -11,8 +11,8 @@ Full spec lives in AiGen_Master_Prompt.md. Read it if anything here is unclear.
 - Plain module-level functions. One class permitted in the entire project.
 - Synchronous Flask only. No async, no threads, no background workers.
 - Every function under 40 lines. Every file under 300 lines.
-- 16 source files: app.py, config.py, six in services/, four templates, two
-  stylesheets and two scripts. Tests live in tests/ and are not counted.
+- 15 source files: app.py, config.py, six in services/, four templates, two
+  stylesheets and one script. Tests live in tests/ and are not counted.
 - No dead code, no placeholders, no unused imports, no unused CSS.
 - No emojis anywhere.
 - No em dashes and no en dashes anywhere, including commit messages.
