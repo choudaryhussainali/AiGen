@@ -11,7 +11,7 @@ user uploads lives in server RAM only and is destroyed the moment they log out.
   answers that stream in, page citations, and memory of the last few questions.
 - **Exam Prep** turns a pasted course outline into a topic by topic study plan.
 - **Past Paper Solver** reads a question image and solves it with working shown.
-- **Video Summarizer** turns a YouTube link into a summary in your chosen language.
+- **Video Summarizer** explains a whole YouTube video simply, in your chosen language.
 - **Topic Explainer** explains any topic with a definition, an analogy and three
   key points.
 
@@ -100,10 +100,10 @@ processing stage.
 
 - Prompts are in English. Video summaries can be written in six languages.
 - Notes chat keeps 4 exchanges, reads 7,000 characters, spots Chapter 3 style headings.
-- One worker only. Sessions live in one process's memory, so production needs a
-  single Gunicorn worker (`gunicorn -w 1 app:app`); a second would not see them.
+- One worker only, since sessions live in one process's memory, with a long
+  timeout for long videos: `gunicorn -w 1 --timeout 300 app:app`.
 - PDFs are capped at 10 MB, past paper images at 3 MB for Groq's image limit.
-- Videos without subtitles cannot be summarised, there is no transcript to read.
+- Videos need subtitles, and only about their first 90 minutes are summarised.
 - Embeddings have no request limit, they run locally. Groq's free tier allows
   1,000 requests a day and 8,000 tokens a minute on each model this app uses,
   which is why documents are capped at 12,000 characters before summarising.
