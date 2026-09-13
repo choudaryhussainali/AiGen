@@ -245,11 +245,7 @@ function runTopic() {
 }
 
 async function logout() {
-  try {
-    await post("/api/logout");
-  } catch (error) {
-    toast(error.message, "error");
-  }
+  try { await post("/api/logout"); } catch (error) { toast(error.message, "error"); }
   window.location = "/";
 }
 
