@@ -52,7 +52,7 @@ The first start downloads the embedding model, about 90 MB, and caches it.
 | `FLASK_SECRET_KEY` | Any random string you invent |
 | `SUPABASE_URL` | Supabase dashboard, Project Settings, API |
 | `SUPABASE_KEY` | Same page, the **anon public** key, never `service_role` |
-| `GEMINI_API_KEY` | https://aistudio.google.com/apikey |
+| `GROQ_API_KEY` | https://console.groq.com/keys, the only AI key the app needs |
 
 The key used on the server is the anon public key, which is safe in application
 code because row level security governs what it can reach. In the Supabase
