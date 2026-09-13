@@ -102,7 +102,7 @@ processing stage.
 - No chat history, follow up answers are not remembered between questions.
 - One worker only. Sessions live in one process's memory, so production needs a
   single Gunicorn worker (`gunicorn -w 1 app:app`); a second would not see them.
-- Uploads are capped at 10 MB, for both PDFs and images.
+- PDFs are capped at 10 MB, past paper images at 3 MB for Groq's image limit.
 - Videos without subtitles cannot be summarised, there is no transcript to read.
 - The Gemini free tier is small. It allows 20 `gemini-2.5-flash` requests a day
   and 100 embedding requests a minute, so a day of testing can use it up. Enable
