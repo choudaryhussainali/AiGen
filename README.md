@@ -104,6 +104,6 @@ processing stage.
   single Gunicorn worker (`gunicorn -w 1 app:app`); a second would not see them.
 - PDFs are capped at 10 MB, past paper images at 3 MB for Groq's image limit.
 - Videos without subtitles cannot be summarised, there is no transcript to read.
-- The Gemini free tier is small. It allows 20 `gemini-2.5-flash` requests a day
-  and 100 embedding requests a minute, so a day of testing can use it up. Enable
-  billing on the Google Cloud project behind the key to lift both.
+- Embeddings have no request limit, they run locally. Groq's free tier allows
+  1,000 requests a day and 8,000 tokens a minute on each model this app uses,
+  which is why documents are capped at 12,000 characters before summarising.
