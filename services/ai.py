@@ -1,6 +1,7 @@
 """All Groq calls, local embeddings and the retrieval step for notes questions."""
 
 import base64
+import re
 
 import numpy as np
 import requests
@@ -105,6 +106,13 @@ def _chat_messages(system, history, question):
     return messages
 
 
+def _cited_pages(answer, shown):
+    """Pages the answer names, limited to the pages it was actually shown."""
+    groups = re.findall(r"pages?\s+([\d\s,&and]+)", answer, re.IGNORECASE)
+    named = {int(number) for group in groups for number in re.findall(r"\d+", group)}
+    return sorted(named & set(shown))
+
+
 def answer_from_notes(question, chunks, embeddings, summary, history):
     top = _top_chunks(question, chunks, embeddings)
     context = "\n\n".join(
@@ -128,7 +136,7 @@ Cite the pages you used in the form (page 3) and use **bold** for key terms.
 
 Do not use emojis. Do not use dash characters other than the plain hyphen."""
     answer = _chat(_chat_messages(prompt, history, question), config.TEXT_MODEL)
-    return answer, sorted({chunk["page"] for chunk in top})
+    return answer, _cited_pages(answer, [chunk["page"] for chunk in top])
 
 
 def build_exam_plan(outline):
