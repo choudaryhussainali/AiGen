@@ -1,7 +1,8 @@
+import functools
 import io
 import json
 
-from flask import Flask, Response, jsonify, redirect, render_template, request, session
+from flask import Flask, Response, g, jsonify, redirect, render_template, request, session
 from werkzeug.exceptions import RequestEntityTooLarge
 
 import config
@@ -51,6 +52,23 @@ def current_session():
     if not session_id:
         return None, None
     return session_id, store.get_session(session_id)
+
+
+def login_required(view):
+    """API routes answer 401 without a live session, before their own body runs."""
+    @functools.wraps(view)
+    def guarded(*args, **kwargs):
+        try:
+            g.session_id, g.active = current_session()
+        except ValueError as error:
+            return json_error(str(error))
+        except Exception:
+            app.logger.exception("unhandled error")
+            return json_error("Something went wrong. Please try again.", 500)
+        if g.active is None:
+            return json_error("Not authenticated", 401)
+        return view(*args, **kwargs)
+    return guarded
 
 
 def signed_out_page(template):
@@ -123,11 +141,9 @@ def api_login():
 
 
 @app.post("/api/notes/upload")
+@login_required
 def api_notes_upload():
     try:
-        session_id, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
         upload = get_upload()
         if upload is None:
             return json_error("Please choose a file first.")
@@ -137,7 +153,7 @@ def api_notes_upload():
         embeddings = ai.embed_documents([chunk["text"] for chunk in chunks])
         full_text = "\n".join(page["text"] for page in pages)
         summary = ai.summarize_notes(full_text[:config.MAX_SUMMARY_CHARS])
-        store.set_document(session_id, chunks, embeddings, upload.filename, summary)
+        store.set_document(g.session_id, chunks, embeddings, upload.filename, summary)
         return json_ok(
             {"summary": summary, "filename": upload.filename, "pages": len(pages)}
         )
@@ -168,11 +184,10 @@ def answer_events(session_id, question, pieces, shown):
 
 
 @app.post("/api/notes/ask")
+@login_required
 def api_notes_ask():
     try:
-        session_id, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
+        session_id, active = g.session_id, g.active
         question = (request.get_json(silent=True) or {}).get("question", "").strip()
         if not question:
             return json_error("Please enter something first.")
@@ -192,11 +207,9 @@ def api_notes_ask():
 
 
 @app.post("/api/exam")
+@login_required
 def api_exam():
     try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
         outline = (request.get_json(silent=True) or {}).get("outline", "").strip()
         if not outline:
             return json_error("Please enter something first.")
@@ -209,11 +222,9 @@ def api_exam():
 
 
 @app.post("/api/paper/solve")
+@login_required
 def api_paper_solve():
     try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
         upload = get_upload()
         if upload is None:
             return json_error("Please choose a file first.")
@@ -232,11 +243,9 @@ def api_paper_solve():
 
 
 @app.post("/api/video")
+@login_required
 def api_video():
     try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
         payload = request.get_json(silent=True) or {}
         url = (payload.get("url") or "").strip()
         language = payload.get("language") or "English"
@@ -258,11 +267,9 @@ def api_video():
 
 
 @app.post("/api/topic")
+@login_required
 def api_topic():
     try:
-        _, active = current_session()
-        if active is None:
-            return json_error("Not authenticated", 401)
         topic = (request.get_json(silent=True) or {}).get("topic", "").strip()
         if not topic:
             return json_error("Please enter something first.")
