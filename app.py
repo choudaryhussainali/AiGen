@@ -89,7 +89,11 @@ def api_signup():
             return json_error("Please enter something first.")
         if len(password) < 6:
             return json_error("Password must be at least 6 characters.")
-        auth.sign_up(email, password)
+        first_name = (payload.get("first_name") or "").strip()[:50]
+        last_name = (payload.get("last_name") or "").strip()[:50]
+        if not first_name or not last_name:
+            return json_error("Please enter your first name and last name.")
+        auth.sign_up(email, password, first_name, last_name)
         return json_ok({"message": "Account created"})
     except ValueError as error:
         return json_error(str(error))

@@ -25,9 +25,13 @@ def _friendly_error(error):
     return "Something went wrong. Please try again."
 
 
-def sign_up(email, password):
+def sign_up(email, password, first_name, last_name):
+    # Names live in the Supabase user metadata, so no table of our own is needed.
+    names = {"first_name": first_name, "last_name": last_name}
     try:
-        result = _client.auth.sign_up({"email": email, "password": password})
+        result = _client.auth.sign_up(
+            {"email": email, "password": password, "options": {"data": names}}
+        )
     except Exception as error:
         raise ValueError(_friendly_error(error))
     if result.user is None:
