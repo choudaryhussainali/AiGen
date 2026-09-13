@@ -57,10 +57,26 @@ def _chat(messages, model):
         response = _post(payload)
     if response.status_code != 200:
         raise ValueError(_status_message(response.status_code))
-    text = response.json()["choices"][0]["message"]["content"].strip()
+    text = _plain_markdown(response.json()["choices"][0]["message"]["content"]).strip()
     if not text:
         raise ValueError("The model returned an empty response. Please try again.")
     return text
+
+
+def _plain_markdown(text):
+    """Rewrites tables and deep headings into the four forms the page renders."""
+    lines = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped and re.fullmatch(r"[\s:|-]+", stripped):
+            continue
+        if stripped.startswith("|"):
+            cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+            line = "- " + "; ".join(cell for cell in cells if cell)
+        elif stripped.startswith("#"):
+            line = "## " + stripped.lstrip("#").strip()
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def _status_message(status):
