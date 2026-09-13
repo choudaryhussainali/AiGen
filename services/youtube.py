@@ -48,7 +48,7 @@ def _pick_transcript(listing):
     return (english or transcripts or [None])[0]
 
 
-def _friendly_error(error):
+def _transcript_error_message(error):
     for kinds, message in _ERROR_MESSAGES:
         if isinstance(error, kinds):
             return message
@@ -60,7 +60,7 @@ def fetch_transcript(video_id):
         transcript = _pick_transcript(YouTubeTranscriptApi().list(video_id))
         fetched = transcript.fetch() if transcript else []
     except Exception as error:
-        raise ValueError(_friendly_error(error))
+        raise ValueError(_transcript_error_message(error))
     text = " ".join(snippet.text for snippet in fetched)
     if not text.strip():
         raise ValueError(_NO_SUBTITLES)
