@@ -122,11 +122,17 @@ def _fit_budget(indices, chunks):
 
 
 def _pick_chunks(question, history, chunks, embeddings):
-    """A document that fits the budget is sent whole, otherwise the best matches."""
+    """Whole small documents, a named chapter, or the best matching chunks."""
     if sum(len(chunk["text"]) for chunk in chunks) <= config.CONTEXT_CHARS:
         return list(range(len(chunks)))
     search = _search_text(question, history)
-    return _fit_budget(_ranked_chunks(search, chunks, embeddings), chunks)
+    number = documents.section_number(question) or documents.section_number(search)
+    section = documents.section_chunks(chunks, number) if number else []
+    ranked = _ranked_chunks(search, chunks, embeddings)
+    if section and documents.keywords(search):
+        # A focused question inside a chapter reads its most relevant parts first.
+        return _fit_budget([index for index in ranked if index in section], chunks)
+    return _fit_budget(section or ranked, chunks)
 
 
 def summarize_notes(text):

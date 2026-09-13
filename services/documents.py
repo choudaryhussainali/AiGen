@@ -83,3 +83,34 @@ def keywords(text):
     """Distinct content words, the part of a question worth matching exactly."""
     words = re.findall(r"[a-z0-9]+", text.lower())
     return {word for word in words if len(word) > 2 and word not in _STOPWORDS}
+
+
+_SECTION = (
+    r"(?:chapter|chap|chp|ch|unit|lecture|lesson|module|part|week)"
+    r"(?:\.?\s*([0-9]+)|[.\s]+([ivx]+|one|two|three|four|five|six|seven|eight|nine|ten))\b"
+)
+_NUMBERS = dict(zip("one two three four five six seven eight nine ten".split(), range(1, 11)))
+_NUMBERS.update(zip("i ii iii iv v vi vii viii ix x".split(), range(1, 11)))
+
+
+def _to_number(digits, name):
+    return int(digits) if digits else _NUMBERS.get(name.lower())
+
+
+def section_number(text):
+    """The chapter, unit or lecture number a question names, if it names one."""
+    match = re.search(r"\b" + _SECTION, text, re.IGNORECASE)
+    return _to_number(*match.groups()) if match else None
+
+
+def section_chunks(chunks, number):
+    """Every chunk from the heading that names the section to the next heading."""
+    heading = re.compile(r"^\s*" + _SECTION, re.IGNORECASE | re.MULTILINE)
+    picked, current = [], None
+    for index, chunk in enumerate(chunks):
+        found = [n for n in (_to_number(*g) for g in heading.findall(chunk["text"])) if n]
+        if current == number or number in found:
+            picked.append(index)
+        if found:
+            current = found[-1]
+    return picked
