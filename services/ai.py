@@ -23,11 +23,15 @@ def embed_query(text):
 
 def _chat(messages, model):
     """One POST to the OpenAI compatible endpoint Groq exposes."""
+    payload = {"model": model, "messages": messages, "temperature": 0.3}
+    if model.startswith("openai/gpt-oss"):
+        # Hidden reasoning tokens count against the per minute token budget.
+        payload["reasoning_effort"] = "low"
     try:
         response = requests.post(
             f"{config.GROQ_BASE_URL}/chat/completions",
             headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
-            json={"model": model, "messages": messages, "temperature": 0.3},
+            json=payload,
             timeout=config.REQUEST_TIMEOUT_SECONDS,
         )
     except requests.exceptions.RequestException:
