@@ -53,12 +53,20 @@ def current_session():
     return session_id, store.get_session(session_id)
 
 
+def signed_out_page(template):
+    """Visitor pages, anyone already logged in goes straight to the dashboard."""
+    _, active = current_session()
+    return redirect("/dashboard") if active else render_template(template)
+
+
 @app.get("/")
 def index():
-    _, active = current_session()
-    if active:
-        return redirect("/dashboard")
-    return render_template("auth.html")
+    return signed_out_page("auth.html")
+
+
+@app.get("/login")
+def login_page():
+    return signed_out_page("auth.html")
 
 
 @app.get("/dashboard")
