@@ -245,7 +245,7 @@ function runPaper() {
 function runVideo() {
   const url = document.getElementById("video-input").value.trim();
   if (!url) { return toast("Please enter something first.", "error"); }
-  runTool({ tool: "video", status: "Fetching transcript..." }, async function () {
+  runTool({ tool: "video", status: "Reading the whole video, long ones can take a few minutes..." }, async function () {
     const data = await post("/api/video", { url: url, language: document.getElementById("video-language").value });
     showCard("video", renderMarkdown(data.summary));
   });
